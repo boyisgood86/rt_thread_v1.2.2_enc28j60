@@ -35,15 +35,15 @@ void tcp_client(void)
   }
   
   /*setsockopt*/
-//  err = setsockopt(client_sock, SOL_SOCKET, 
-//                   SO_REUSEADDR, 
-//                   (const char*)&sock_reuse, sizeof(sock_reuse));
-//  
-//  if(err < 0) {
-//    MY_DEBUG("setsockopt faild!\n\r");
-////    lwip_close(client_sock);
-//    goto OUT;
-//  }
+  err = setsockopt(client_sock, SOL_SOCKET, 
+                   SO_REUSEADDR, 
+                   (const char*)&sock_reuse, sizeof(sock_reuse));
+  
+  if(err < 0) {
+    MY_DEBUG("setsockopt faild!\n\r");
+//    lwip_close(client_sock);
+    goto OUT;
+  }
   
 //  err = setsockopt(client_sock, SOL_SOCKET, 
 //                   SO_REUSEPORT, 
