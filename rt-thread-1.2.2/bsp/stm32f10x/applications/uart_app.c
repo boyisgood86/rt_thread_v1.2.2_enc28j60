@@ -20,12 +20,7 @@
 #endif
 
 
-#define _DEBUG   (1)
-#if _DEBUG
-  #define MY_DEBUG(fmt, args...) do{rt_kprintf(fmt, ##args);}while(0)
-#else
-  #define MY_DEBUG(fmt, args...)    do{}while(0)
-#endif /*_DEBUG*/
+
 
 #define     USART   ("uart1") 
 

@@ -43,36 +43,36 @@
 #include "led.h"
 
 ALIGN(RT_ALIGN_SIZE)
-static rt_uint8_t led_stack[ 512 ];
-static struct rt_thread led_thread;
-static void led_thread_entry(void* parameter)
-{
-    unsigned int count=0;
-
-    rt_hw_led_init();
-
-    while (1)
-    {
-        /* led1 on */
-      MY_DEBUG("led on....\n\r");
-      rt_thread_delay( RT_TICK_PER_SECOND/2 ); /* sleep 0.5 second and switch to other thread */
-      MY_DEBUG("led off...\n\r");
-      rt_thread_delay( RT_TICK_PER_SECOND/2 ); /* sleep 0.5 second and switch to other thread */
-//#ifndef RT_USING_FINSH
-//        rt_kprintf("led on, count : %d\r\n",count);
-//#endif
-//        count++;
-//        rt_hw_led_on(0);
-//        rt_thread_delay( RT_TICK_PER_SECOND/2 ); /* sleep 0.5 second and switch to other thread */
+//static rt_uint8_t led_stack[ 512 ];
+//static struct rt_thread led_thread;
+//static void led_thread_entry(void* parameter)
+//{
+//    unsigned int count=0;
 //
-//        /* led1 off */
-//#ifndef RT_USING_FINSH
-//        rt_kprintf("led off\r\n");
-//#endif
-//        rt_hw_led_off(0);
-//        rt_thread_delay( RT_TICK_PER_SECOND/2 );
-    }
-}
+//    rt_hw_led_init();
+//
+//    while (1)
+//    {
+//        /* led1 on */
+//      MY_DEBUG("led on....\n\r");
+//      rt_thread_delay( RT_TICK_PER_SECOND/2 ); /* sleep 0.5 second and switch to other thread */
+//      MY_DEBUG("led off...\n\r");
+//      rt_thread_delay( RT_TICK_PER_SECOND/2 ); /* sleep 0.5 second and switch to other thread */
+////#ifndef RT_USING_FINSH
+////        rt_kprintf("led on, count : %d\r\n",count);
+////#endif
+////        count++;
+////        rt_hw_led_on(0);
+////        rt_thread_delay( RT_TICK_PER_SECOND/2 ); /* sleep 0.5 second and switch to other thread */
+////
+////        /* led1 off */
+////#ifndef RT_USING_FINSH
+////        rt_kprintf("led off\r\n");
+////#endif
+////        rt_hw_led_off(0);
+////        rt_thread_delay( RT_TICK_PER_SECOND/2 );
+//    }
+//}
 
 extern void tcp_client(void);
 
@@ -123,67 +123,67 @@ void rt_init_thread_entry(void* parameter)
         rt_kprintf("File System initialzation failed!\n");
 #endif  /* RT_USING_DFS */
 
-#ifdef RT_USING_RTGUI
-    {
-        extern void rt_hw_lcd_init();
-        extern void rtgui_touch_hw_init(void);
-
-        rt_device_t lcd;
-
-        /* init lcd */
-        rt_hw_lcd_init();
-
-        /* init touch panel */
-        rtgui_touch_hw_init();
-
-        /* find lcd device */
-        lcd = rt_device_find("lcd");
-
-        /* set lcd device as rtgui graphic driver */
-        rtgui_graphic_set_device(lcd);
-
-#ifndef RT_USING_COMPONENTS_INIT
-        /* init rtgui system server */
-        rtgui_system_server_init();
-#endif
-
-        calibration_set_restore(cali_setup);
-        calibration_set_after(cali_store);
-        calibration_init();
-    }
-#endif /* #ifdef RT_USING_RTGUI */
+//#ifdef RT_USING_RTGUI
+//    {
+//        extern void rt_hw_lcd_init();
+//        extern void rtgui_touch_hw_init(void);
+//
+//        rt_device_t lcd;
+//
+//        /* init lcd */
+//        rt_hw_lcd_init();
+//
+//        /* init touch panel */
+//        rtgui_touch_hw_init();
+//
+//        /* find lcd device */
+//        lcd = rt_device_find("lcd");
+//
+//        /* set lcd device as rtgui graphic driver */
+//        rtgui_graphic_set_device(lcd);
+//
+//#ifndef RT_USING_COMPONENTS_INIT
+//        /* init rtgui system server */
+//        rtgui_system_server_init();
+//#endif
+//
+//        calibration_set_restore(cali_setup);
+//        calibration_set_after(cali_store);
+//        calibration_init();
+//    }
+//#endif /* #ifdef RT_USING_RTGUI */
 
 #ifdef RT_USING_LWIP
 	#ifdef ENC28J60
 		rt_hw_enc28j60_init();
 	#endif /*ENC28J60*/
+        
+    #ifdef  TCP_CLIENT
+          sys_thread_new("tcp_client", tcp_client_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);
+    #endif   /*TCP_CLIENT*/     
+
 #endif /*RT_USING_LWIP*/
-        
-#ifdef  TCP_CLIENT
-      sys_thread_new("tcp_client", tcp_client_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);
-#endif   /*TCP_CLIENT*/     
-        
 }
 
 int rt_application_init(void)
 {
     rt_thread_t init_thread;
 
-    rt_err_t result;
+//    rt_err_t result;
 
-    /* init led thread */
-    result = rt_thread_init(&led_thread,
-                            "led",
-                            led_thread_entry,
-                            RT_NULL,
-                            (rt_uint8_t*)&led_stack[0],
-                            sizeof(led_stack),
-                            20,
-                            5);
-    if (result == RT_EOK)
-    {
-        rt_thread_startup(&led_thread);
-    }
+//    /* init led thread */
+//    result = rt_thread_init(&led_thread,
+//                            "led",
+//                            led_thread_entry,
+//                            RT_NULL,
+//                            (rt_uint8_t*)&led_stack[0],
+//                            sizeof(led_stack),
+//                            20,
+//                            5);
+//    if (result == RT_EOK)
+//    {
+//        rt_thread_startup(&led_thread);
+//    }
 
 #if (RT_THREAD_PRIORITY_MAX == 32)
     init_thread = rt_thread_create("init",
