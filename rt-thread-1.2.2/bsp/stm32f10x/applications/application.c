@@ -74,14 +74,28 @@ ALIGN(RT_ALIGN_SIZE)
 //    }
 //}
 
+/*socket mutex*/
+struct rt_mutex socket_mutex;
+/*uart mutex*/
+struct rt_mutex uart_mutex;
+
 extern void tcp_client(void);
 
-void tcp_client_thread(void *arg)
+static void tcp_client_thread(void *arg)
 {
   
   while(1) {
     tcp_client();
     rt_thread_delay(3000);
+  }
+}
+
+extern void uart_tcp(void);
+static void uart_tcp_thread(void *arg)
+{
+  while(1) {
+    uart_tcp();
+    rt_thread_delay(1000);
   }
 }
 
@@ -152,6 +166,9 @@ void rt_init_thread_entry(void* parameter)
 //        calibration_init();
 //    }
 //#endif /* #ifdef RT_USING_RTGUI */
+    
+    rt_mutex_init(&socket_mutex,"musb",RT_IPC_FLAG_FIFO); 
+    rt_mutex_init(&uart_mutex,"uart",RT_IPC_FLAG_FIFO); //uart_mutex
 
 #ifdef RT_USING_LWIP
 	#ifdef ENC28J60
@@ -160,7 +177,11 @@ void rt_init_thread_entry(void* parameter)
         
     #ifdef  TCP_CLIENT
           sys_thread_new("tcp_client", tcp_client_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);
-    #endif   /*TCP_CLIENT*/     
+    #endif   /*TCP_CLIENT*/
+          
+    #ifdef UART_TO_TCP
+          sys_thread_new("tcp_uart", uart_tcp_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);    
+    #endif /*UART_TO_TCP*/
 
 #endif /*RT_USING_LWIP*/
 }

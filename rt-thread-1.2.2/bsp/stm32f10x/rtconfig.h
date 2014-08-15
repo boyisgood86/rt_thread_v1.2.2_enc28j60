@@ -15,6 +15,7 @@
 
 #define ENC28J60
 #define TCP_CLIENT
+#define UART_TO_TCP
 
 
 //#define DM9000

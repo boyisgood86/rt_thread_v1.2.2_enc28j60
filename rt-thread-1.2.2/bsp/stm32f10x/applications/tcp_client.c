@@ -1,6 +1,7 @@
 #include <rtthread.h>
 #include <lwip/netdb.h> 
 #include <lwip/sockets.h>
+#include "ymconfig.h"
 
 
 #define LEN     (256)
@@ -26,6 +27,7 @@ int client_sock = -1;
 int recv_bytes = -1;
 
 
+extern struct rt_mutex socket_mutex;
 
 
 /*deal with data which recvived from remote tcp server*/
@@ -93,6 +95,7 @@ int set_socket(int sockfd, int flag)
         return FALSE_KEEPALIVE;
       }
   }
+  //TODO :  add other flag at here.
 
   return TRUE;
 //  setsockopt(sockfd, SOL_TCP, TCP_KEEPIDLE, (void*)&keepidle , sizeof(keepidle ));
@@ -230,8 +233,8 @@ int client_hearbet(void)
 
 void tcp_client(void)
 {
-  //TODO..
-  int retval = -1, maxfdp = -1, heart_count = 0;
+  
+  int retval = -1, maxfdp = -1, timeout_count = 0, err = -1;
   int recv_bytes = -1;
   char client_buff[LEN];
   char err_back[] = "Hi, data string error!";
@@ -239,15 +242,24 @@ void tcp_client(void)
   fd_set readset;
   
   /*init socket*/
-  if(init_socket() == FALSE) {
-    MY_DEBUG("%s, %d: init socket faild !\n\r",__func__,__LINE__);
-    return ;
+  if(client_sock < 0) {
+    //TODO...
+    rt_mutex_take(&socket_mutex,RT_WAITING_FOREVER);
+    if(init_socket() == FALSE) {
+      MY_DEBUG("%s, %d: init socket faild !\n\r",__func__,__LINE__);
+      rt_mutex_release(&socket_mutex);
+      return ;
+    }
+
   }
+  
   /*Hearbeat*/
     if(client_hearbet() == FALSE) {
       MY_DEBUG("%s, %d: heart beat data faild !\n\r",__func__,__LINE__);
+      rt_mutex_release(&socket_mutex);
       return ;
     }
+    rt_mutex_release(&socket_mutex);
   
   while(1) {
     timeout.tv_sec = 20;
@@ -264,8 +276,8 @@ void tcp_client(void)
       return ;
     }
     else if(retval == 0) {
-      heart_count++;
-      if(heart_count == 100) {
+      timeout_count++;
+      if(timeout_count == 100) {
         lwip_close(client_sock);
         client_sock = -1;
         return ;
@@ -277,31 +289,50 @@ void tcp_client(void)
     else {
       if(FD_ISSET(client_sock, &readset)) {
         rt_memset(client_buff, 0, LEN);
+        
+        rt_mutex_take(&socket_mutex,RT_WAITING_FOREVER);
         recv_bytes = recv(client_sock, client_buff, LEN, 0);
+        rt_mutex_release(&socket_mutex);
+        
         if(recv_bytes <= 0) {
-          MY_DEBUG("tcp client restart..\n\r");
-          return ;
+            lwip_close(client_sock);
+            client_sock = -1;          
+            MY_DEBUG("tcp client restart..\n\r");
+            return ;
         }
         //do data
+        timeout_count = 0;
         MY_DEBUG("%s, %d: recv data from remote server : %s\n\r",__func__,__LINE__,client_buff);
         retval = deal_data(client_buff, recv_bytes);
         if(retval == TRUE) {
           MY_DEBUG("%s, %d: OK! \n\r",__func__,__LINE__);
           continue ;
         }else if(retval == DATA_ERR) {
+          
+          rt_mutex_take(&socket_mutex,RT_WAITING_FOREVER);
           if(send(client_sock, err_back, sizeof(err_back), 0) < 0) {
             lwip_close(client_sock);
             client_sock = -1;
+            rt_mutex_release(&socket_mutex);
             return ;
           }
+          rt_mutex_release(&socket_mutex);
         }
       }
       //must ?
-      heart_count++;
+      timeout_count++;
       FD_CLR(client_sock,&readset);
-      if(heart_count == 1000) {
-         lwip_close(client_sock);
-         client_sock = -1;
+      if(timeout_count == 100000UL) {
+        timeout_count = 0;
+        rt_mutex_take(&socket_mutex,RT_WAITING_FOREVER);
+        err = client_hearbet();
+        rt_mutex_release(&socket_mutex);
+        if(err == FALSE){
+          MY_DEBUG("%s, %d: send heartbeat faild !\n\r",__func__,__LINE__);
+          lwip_close(client_sock);
+          client_sock = -1;          
+          
+        }
          return ;
       }
     }

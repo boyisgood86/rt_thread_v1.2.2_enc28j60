@@ -22,55 +22,123 @@
 
 
 
-#define     USART   ("uart1") 
+#define     USART        ("uart1") 
+#define     NAME_NULL    ("name_null")
+#define     NO_UART      ("no_uart")
+#define     UART_OK      ("uart_ok")
 
 #define     LEN     (1024)
 
-extern int client_sock;
+
+
+
+rt_device_t usart_device = NULL;
+
+
+
 
 
 unsigned char tx_buff[] = "Hello, I/m usart 1 ,just demo !\n\r";
 char rx_buff[LEN];
 
+extern struct rt_mutex socket_mutex;
+extern struct rt_mutex uart_mutex;
+extern int client_sock;
+//rt_mutex_take(&socket_mutex,RT_WAITING_FOREVER);
+//rt_mutex_release(&socket_mutex);
 
-void usart1_tcpip(void)
+
+
+char * find_uart(rt_device_t device, const char *name)
 {
-   rt_device_t usart_device;
-   rt_err_t result = RT_EOK;  
-   int read_size = -1;
-
-#ifdef RT_USING_UART1   
-   /*find uart1*/
-   usart_device = rt_device_find(USART);
-   if (usart_device == RT_NULL) {
-      MY_DEBUG("Can't find device %s \n\r", USART);
-      goto OUT;
-   } 
-//      rt_device_open(usart_device, RT_DEVICE_OFLAG_RDWR);  
-    while(1) {
-      rt_memset(rx_buff, 0, LEN);
-      read_size = rt_device_read(usart_device, 0, rx_buff, LEN);
-      if(read_size > 0) {
-        rt_device_write(usart_device, 0, rx_buff, read_size);
-        MY_DEBUG("Now tcp client fd is %d\n\r", client_sock);
-        if(client_sock >= 0) {
-          if(lwip_send(client_sock, rx_buff, read_size,0) < 0) {
-            MY_DEBUG("%s , %d : send faild!\n\r",__func__,__LINE__);
-          }
-          lwip_send(client_sock, "\n\r", 4, 0);
-        }
-        
-        MY_DEBUG("\n\r");
-      }else {
-        rt_device_write(usart_device, 0, tx_buff, sizeof(tx_buff));
-      }
-      rt_thread_delay(1000);
-    }
-#endif
-   return ;
-OUT:  
-  return ;
+  if(!name) {
+    MY_DEBUG("%s, %d: Name NULL..\n\r",__func__,__LINE__);
+    return NAME_NULL;
+  }
+  /*find uart*/
+  usart_device = rt_device_find(name);
+  if(usart_device == RT_NULL) {
+    MY_DEBUG("%s, %d: find %s faild..\n\r",__func__,__LINE__,name);
+    return NO_UART;
+  }
+  MY_DEBUG("%s, %d: find %s success..\n\r",__func__,__LINE__,name);
+  return UART_OK ;
 }
+
+
+
+
+
+
+
+
+
+
+
+/*uart to tcp */
+void uart_tcp(void)
+{
+  int err  =-1;
+  if (client_sock < 0) {
+    return ;
+  }
+  err = rt_mutex_take(&socket_mutex,1000);
+  if(err < 0) {
+    MY_DEBUG("%s, %d: No socket mutex..\n\r",__func__,__LINE__);
+    return ;
+  }
+  err = send(client_sock, tx_buff, sizeof(tx_buff), 0);
+  rt_mutex_release(&socket_mutex);
+  if(err < 0) {
+    MY_DEBUG("%s, %d: send faild !\n\r",__func__,__LINE__);
+    lwip_close(client_sock);
+    client_sock = -1;
+    return ;
+  }
+  //TODO..
+}
+
+
+
+
+//void usart1_tcpip(void)
+//{
+//   rt_device_t usart_device;
+//   rt_err_t result = RT_EOK;  
+//   int read_size = -1;
+//
+//#ifdef RT_USING_UART1   
+//   /*find uart1*/
+//   usart_device = rt_device_find(USART);
+//   if (usart_device == RT_NULL) {
+//      MY_DEBUG("Can't find device %s \n\r", USART);
+//      goto OUT;
+//   } 
+////      rt_device_open(usart_device, RT_DEVICE_OFLAG_RDWR);  
+//    while(1) {
+//      rt_memset(rx_buff, 0, LEN);
+//      read_size = rt_device_read(usart_device, 0, rx_buff, LEN);
+//      if(read_size > 0) {
+//        rt_device_write(usart_device, 0, rx_buff, read_size);
+//        MY_DEBUG("Now tcp client fd is %d\n\r", client_sock);
+//        if(client_sock >= 0) {
+//          if(lwip_send(client_sock, rx_buff, read_size,0) < 0) {
+//            MY_DEBUG("%s , %d : send faild!\n\r",__func__,__LINE__);
+//          }
+//          lwip_send(client_sock, "\n\r", 4, 0);
+//        }
+//        
+//        MY_DEBUG("\n\r");
+//      }else {
+//        rt_device_write(usart_device, 0, tx_buff, sizeof(tx_buff));
+//      }
+//      rt_thread_delay(1000);
+//    }
+//#endif
+//   return ;
+//OUT:  
+//  return ;
+//}
 
 
 
