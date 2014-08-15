@@ -10,7 +10,8 @@
 
 #define CLIENT_PORT     (10030)
 
-enum ERR {
+enum VAL {
+ KEEP_ALIVE = 1,
  TRUE = 0,
  FALSE = -1,
  DATA_ERR = -100,
@@ -62,7 +63,7 @@ int deal_data(const char *s, int bytes)
 }
 
 
-int set_socket(int sockfd)
+int set_socket(int sockfd, int flag)
 {
   int sock_reuse = 1;
   int err = -1;
@@ -81,17 +82,17 @@ int set_socket(int sockfd)
     return FALSE_REUSEADDR;    
   }
   /*keepalive*/
-  int keepalive = 1; // 开启keepalive属性
-//  int keepidle = 60; // 如该连接在60秒内没有任何数据往来,则进行探测
-//  int keepinterval = 5; // 探测时发包的时间间隔为5 秒
-//  int keepcount = 3; // 探测尝试的次数。如果第1次探测包就收到响应了,则后2次的不再发。
-  err = setsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, (void *)&keepalive , sizeof(keepalive ));
-  if(err < 0) {
-    MY_DEBUG("%s, %d: Keep alive faild !\n\r",__func__,__LINE__);
-    return FALSE_KEEPALIVE;
+  if(flag == KEEP_ALIVE) {
+      int keepalive = 1; // 开启keepalive属性
+    //  int keepidle = 60; // 如该连接在60秒内没有任何数据往来,则进行探测
+    //  int keepinterval = 5; // 探测时发包的时间间隔为5 秒
+    //  int keepcount = 3; // 探测尝试的次数。如果第1次探测包就收到响应了,则后2次的不再发。
+      err = setsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, (void *)&keepalive , sizeof(keepalive ));
+      if(err < 0) {
+        MY_DEBUG("%s, %d: Keep alive faild !\n\r",__func__,__LINE__);
+        return FALSE_KEEPALIVE;
+      }
   }
-  
-//  if(i == TCP_KEEPCNT_DEFAULT );
 
   return TRUE;
 //  setsockopt(sockfd, SOL_TCP, TCP_KEEPIDLE, (void*)&keepidle , sizeof(keepidle ));
@@ -119,7 +120,7 @@ int init_socket(void)
     return FALSE;
   }
   /*setsockopt*/
-  err = set_socket(client_sock);
+  err = set_socket(client_sock, KEEP_ALIVE);
   if(err < 0) {
     MY_DEBUG("setsockopt faild!\n\r");
     lwip_close(client_sock);
