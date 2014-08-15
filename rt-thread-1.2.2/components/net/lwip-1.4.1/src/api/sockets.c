@@ -1096,6 +1096,11 @@ lwip_select(int maxfdp1, fd_set *readset, fd_set *writeset, fd_set *exceptset,
   err_t err;
   int i;
   SYS_ARCH_DECL_PROTECT(lev);
+  
+  /*changed by jason 2014/08/14*/
+  FD_ZERO(&lreadset);
+  FD_ZERO(&lwriteset);
+  FD_ZERO(&lexceptset);
 
   LWIP_DEBUGF(SOCKETS_DEBUG, ("lwip_select(%d, %p, %p, %p, tvsec=%"S32_F" tvusec=%"S32_F")\n",
                   maxfdp1, (void *)readset, (void *) writeset, (void *) exceptset,

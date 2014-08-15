@@ -2,6 +2,7 @@
 #include <lwip/netdb.h> 
 #include <lwip/sockets.h>
 
+
 #define LEN     (256)
 
 #define TEST_IP     ("192.168.1.123")
@@ -13,6 +14,8 @@ enum ERR {
  TRUE = 0,
  FALSE = -1,
  DATA_ERR = -100,
+ FALSE_REUSEADDR = -101,
+ FALSE_KEEPALIVE = -102,
 };
 
 unsigned char send_data[] = "Hello,I/m clinet, just test !";
@@ -59,9 +62,47 @@ int deal_data(const char *s, int bytes)
 }
 
 
+int set_socket(int sockfd)
+{
+  int sock_reuse = 1;
+  int err = -1;
+  MY_DEBUG("%s, %d\n\r",__func__,__LINE__);
+  
+  if(sockfd < 0) {
+    MY_DEBUG("%s, %d: sockfd error!\n\r",__func__,__LINE__);
+    return (int)DATA_ERR;
+  }
+  /*sock_reuse*/
+   err = setsockopt(client_sock, SOL_SOCKET, 
+                   SO_REUSEADDR, 
+                   (const char*)&sock_reuse, sizeof(sock_reuse));
+  if(err < 0) {
+    MY_DEBUG("setsockopt faild!\n\r");
+    return FALSE_REUSEADDR;    
+  }
+  /*keepalive*/
+  int keepalive = 1; // 开启keepalive属性
+//  int keepidle = 60; // 如该连接在60秒内没有任何数据往来,则进行探测
+//  int keepinterval = 5; // 探测时发包的时间间隔为5 秒
+//  int keepcount = 3; // 探测尝试的次数。如果第1次探测包就收到响应了,则后2次的不再发。
+  err = setsockopt(sockfd, SOL_SOCKET, SO_KEEPALIVE, (void *)&keepalive , sizeof(keepalive ));
+  if(err < 0) {
+    MY_DEBUG("%s, %d: Keep alive faild !\n\r",__func__,__LINE__);
+    return FALSE_KEEPALIVE;
+  }
+  
+//  if(i == TCP_KEEPCNT_DEFAULT );
+
+  return TRUE;
+//  setsockopt(sockfd, SOL_TCP, TCP_KEEPIDLE, (void*)&keepidle , sizeof(keepidle ));
+//  setsockopt(sockfd, SOL_TCP, TCP_KEEPINTVL, (void *)&keepinterval , sizeof(keepinterval ));
+//  setsockopt(sockfd, SOL_TCP, TCP_KEEPCNT, (void *)&keepcount , sizeof(keepcount ));  
+  
+}
+
 int init_socket(void)
 {
-  int err = -1, sock_reuse = 1;
+  int err = -1;
   struct sockaddr_in server_addr;
   struct sockaddr_in client_addr;
   
@@ -78,10 +119,7 @@ int init_socket(void)
     return FALSE;
   }
   /*setsockopt*/
-    err = setsockopt(client_sock, SOL_SOCKET, 
-                   SO_REUSEADDR, 
-                   (const char*)&sock_reuse, sizeof(sock_reuse));
-  
+  err = set_socket(client_sock);
   if(err < 0) {
     MY_DEBUG("setsockopt faild!\n\r");
     lwip_close(client_sock);

@@ -1449,7 +1449,7 @@
  * in seconds. (does not require sockets.c, and will affect tcp.c)
  */
 #ifndef LWIP_TCP_KEEPALIVE
-#define LWIP_TCP_KEEPALIVE              0
+#define LWIP_TCP_KEEPALIVE              1   
 #endif
 
 /**
@@ -1457,7 +1457,7 @@
  * SO_SNDTIMEO processing.
  */
 #ifndef LWIP_SO_SNDTIMEO
-#define LWIP_SO_SNDTIMEO                0
+#define LWIP_SO_SNDTIMEO                1
 #endif
 
 /**
@@ -1465,7 +1465,7 @@
  * SO_RCVTIMEO processing.
  */
 #ifndef LWIP_SO_RCVTIMEO
-#define LWIP_SO_RCVTIMEO                0
+#define LWIP_SO_RCVTIMEO                1
 #endif
 
 /**

@@ -135,17 +135,30 @@ err_t            tcp_process_refused_data(struct tcp_pcb *pcb);
 #endif
 
 /* Keepalive values, compliant with RFC 1122. Don't change this unless you know what you're doing */
+//#ifndef  TCP_KEEPIDLE_DEFAULT
+//#define  TCP_KEEPIDLE_DEFAULT     7200000UL /* Default KEEPALIVE timer in milliseconds */
+//#endif
+//
+//#ifndef  TCP_KEEPINTVL_DEFAULT
+//#define  TCP_KEEPINTVL_DEFAULT    75000UL   /* Default Time between KEEPALIVE probes in milliseconds */
+//#endif
+//
+//#ifndef  TCP_KEEPCNT_DEFAULT
+//#define  TCP_KEEPCNT_DEFAULT      9U        /* Default Counter for KEEPALIVE probes */
+//#endif
+/*replace by jason 2014/08/15*/
 #ifndef  TCP_KEEPIDLE_DEFAULT
-#define  TCP_KEEPIDLE_DEFAULT     7200000UL /* Default KEEPALIVE timer in milliseconds */
+#define  TCP_KEEPIDLE_DEFAULT     3000UL  /* Default KEEPALIVE timer in milliseconds */
 #endif
 
 #ifndef  TCP_KEEPINTVL_DEFAULT
-#define  TCP_KEEPINTVL_DEFAULT    75000UL   /* Default Time between KEEPALIVE probes in milliseconds */
+#define  TCP_KEEPINTVL_DEFAULT    1000UL    /* Default Time between KEEPALIVE probes in milliseconds */
 #endif
 
 #ifndef  TCP_KEEPCNT_DEFAULT
-#define  TCP_KEEPCNT_DEFAULT      9U        /* Default Counter for KEEPALIVE probes */
+#define  TCP_KEEPCNT_DEFAULT      3U         /* Default Counter for KEEPALIVE probes */
 #endif
+
 
 #define  TCP_MAXIDLE              TCP_KEEPCNT_DEFAULT * TCP_KEEPINTVL_DEFAULT  /* Maximum KEEPALIVE probe time */
 
