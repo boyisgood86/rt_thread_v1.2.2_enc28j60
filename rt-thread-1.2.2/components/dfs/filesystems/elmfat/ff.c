@@ -1982,7 +1982,8 @@ BYTE check_fs (	/* 0:The FAT BR, 1:Valid BR but not an FAT, 2:Not a BR, 3:Disk e
 {
 	if (disk_read(fs->drv, fs->win, sect, 1) != RES_OK)	/* Load boot record */
 		return 3;
-	if (LD_WORD(&fs->win[BS_55AA]) != 0xAA55)		/* Check record signature (always placed at offset 510 even if the sector size is >512) */
+    /* Check record signature (always placed at offset 510 even if the sector size is >512) */
+	if (LD_WORD(&fs->win[BS_55AA]) != 0xAA55)		/* 如果没有格式化 */
 		return 2;
 
 	if ((LD_DWORD(&fs->win[BS_FilSysType]) & 0xFFFFFF) == 0x544146)	/* Check "FAT" string */

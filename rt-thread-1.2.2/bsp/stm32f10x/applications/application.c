@@ -127,22 +127,28 @@ void rt_init_thread_entry(void* parameter)
 #ifdef  RT_USING_FINSH
     finsh_set_device(RT_CONSOLE_DEVICE_NAME);
 #endif  /* RT_USING_FINSH */
+       
+      rt_hw_spi2_init();  /*Using SPI 2*/
 
-    {
-        rt_hw_spi2_init();
-        if(w25x80_init("flash0", "spi20") != RT_EOK) {
-          MY_DEBUG("%s, %d: w25x80 init faild !\n\r",__func__,__LINE__);
-        }
-    }
     /* Filesystem Initialization */
 #if defined(RT_USING_DFS) && defined(RT_USING_DFS_ELMFAT)
+     
+     dfs_init();
+     elm_init();
+     
+     if(w25x80_init("flash0", "spi20") != RT_EOK) {
+          MY_DEBUG("%s, %d: w25x80 init faild !\n\r",__func__,__LINE__);
+      }     
     /* mount sd card fat partition 1 as root directory */
-    if (dfs_mount("sd0", "/", "elm", 0, 0) == 0)
+    if (dfs_mount("flash0", "/", "elm", 0, 0) == 0)
     {
         rt_kprintf("File System initialized!\n");
     }
-    else
+    else {
         rt_kprintf("File System initialzation failed!\n");
+//        mkfs("elm", "flash0");  /* 如果是spi flash 第一次使用，则打开这里，进行格式化 */
+//        MY_DEBUG("mkfs File System\n\r");
+    }
 #endif  /* RT_USING_DFS */
 
 //#ifdef RT_USING_RTGUI

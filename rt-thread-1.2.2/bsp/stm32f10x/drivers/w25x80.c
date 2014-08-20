@@ -694,7 +694,7 @@ rt_err_t w25x80_init(const char * flash_device_name, const char * spi_device_nam
 
         flash_lock(&spi_flash_device);
     
-        SPI_FLASH_CS_LOW();
+//        SPI_FLASH_CS_LOW();
         cmd = CMD_WRDI;
         rt_spi_send(spi_flash_device.rt_spi_device, &cmd, 1);
 
@@ -716,13 +716,13 @@ rt_err_t w25x80_init(const char * flash_device_name, const char * spi_device_nam
 
         /* SECTOR_SIZE */
         spi_flash_device.geometry.bytes_per_sector = SECTOR_SIZE;
-        spi_flash_device.geometry.block_size = 65536UL; /* block erase: 4k */
+        spi_flash_device.geometry.block_size = 65536UL;     /* block erase: 4k */
 
         /* get memory type and capacity */
         memory_type_capacity = id_recv[1];
         memory_type_capacity = (memory_type_capacity << 8) | id_recv[2];
 
-        MY_DEBUG("%s, %d: memory_type_capacity = 0x%02X\n",__func__,__LINE__,memory_type_capacity);
+//        MY_DEBUG("%s, %d: memory_type_capacity = 0x%02X\n",__func__,__LINE__,memory_type_capacity);
         /* sector_count */
         if(memory_type_capacity == MTC_W25Q128_BV)
         {
@@ -762,8 +762,7 @@ rt_err_t w25x80_init(const char * flash_device_name, const char * spi_device_nam
         else if(memory_type_capacity == MTC_W25X80_TY)
         {
           MY_DEBUG("%s, %d: This is W25x80...\r\n",__func__,__LINE__);
-          spi_flash_device.geometry.sector_count = 512;
-          return -RT_ENOSYS;
+          spi_flash_device.geometry.sector_count = 256;
         }
         else
         {
