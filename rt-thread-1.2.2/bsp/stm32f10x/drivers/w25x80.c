@@ -312,6 +312,7 @@ rt_err_t stm32_spi_register(SPI_TypeDef * SPI,
     GPIO_InitTypeDef GPIO_InitStructure;
     
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB, ENABLE);
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO, ENABLE);
     
     GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF_PP;
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
@@ -341,7 +342,7 @@ rt_err_t stm32_spi_register(SPI_TypeDef * SPI,
 
         GPIO_InitTypeDef GPIO_InitStructure;
 
-        GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_AF_PP;
+        GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
         GPIO_InitStructure.GPIO_Speed = GPIO_Speed_10MHz;
 
         /* spi21: PB12 */
@@ -411,25 +412,28 @@ rt_err_t stm32_spi_register(SPI_TypeDef * SPI,
 
 #define DUMMY                       (0xFF)
 
+/* add W25X80 Memory type and Capacity */
+#define MTC_W25X80_TY               (0x3014)  /* W25X80  */
+
 
 /*************************************************************************/
 
 /*W25X80 command list*/
-//#define CMD_WEn                  (0x06)      /* Write Enable */
-//#define CMD_WDs                  (0x04)      /* Write Disable */
-//#define CMD_RS                   (0x05)      /* Read Status Register */
-//#define CMD_WS                   (0x01)      /* Write Status Register */
-//#define CMD_RD                   (0x03)      /* Read Data */
-//#define CMD_FR                   (0x0B)      /* Fast Read */
-//#define CMD_FRDO                 (0x3B)      /* Fast Read Dual Output */
-//#define CMD_PPr                  (0x02)      /* Page Programming */
-//#define CMD_SE                   (0x20)      /* Sector Erase */
-//#define CMD_BE                   (0xD8)      /* Block Erase */
-//#define CMD_CE                   (0xC7)      /* Chip Erase */
-//#define CMD_Pd                   (0xB9)      /* Power down */
-//#define CMD_RP_ID                (0xAB)      /* Release Power down / Device ID */
-//#define CMD_RM_ID                (0x90)      /* Read Manufacturer / Device ID */
-//#define CMD_JEDEC_ID             (0x9F)      /* JEDEC ID */
+#define CMD_WEn                  (0x06)      /* Write Enable */
+#define CMD_WDs                  (0x04)      /* Write Disable */
+#define CMD_RS                   (0x05)      /* Read Status Register */
+#define CMD_WS                   (0x01)      /* Write Status Register */
+#define CMD_RD                   (0x03)      /* Read Data */
+#define CMD_FR                   (0x0B)      /* Fast Read */
+#define CMD_FRDO                 (0x3B)      /* Fast Read Dual Output */
+#define CMD_PPr                  (0x02)      /* Page Programming */
+#define CMD_SE                   (0x20)      /* Sector Erase */
+#define CMD_BE                   (0xD8)      /* Block Erase */
+#define CMD_CE                   (0xC7)      /* Chip Erase */
+#define CMD_Pd                   (0xB9)      /* Power down */
+#define CMD_RP_ID                (0xAB)      /* Release Power down / Device ID */
+#define CMD_RM_ID                (0x90)      /* Read Manufacturer / Device ID */
+#define CMD_JEDEC_ID             (0x9F)      /* JEDEC ID */
 
 
 /*************************************************************************/
@@ -676,13 +680,14 @@ rt_err_t w25x80_init(const char * flash_device_name, const char * spi_device_nam
         struct rt_spi_configuration cfg;
         cfg.data_width = 8;
         cfg.mode = RT_SPI_MODE_0 | RT_SPI_MSB; /* SPI Compatible: Mode 0 and Mode 3 */
-        cfg.max_hz = 50 * 1000 * 1000; /* 50M */
+        cfg.max_hz = 10 * 1000 * 1000; /* 50M ---> 10 */
         rt_spi_configure(spi_flash_device.rt_spi_device, &cfg);
     }
 
     /* init flash */
     {
         rt_uint8_t i = 0;
+        rt_uint8_t j = 100;
         rt_uint8_t cmd;
         rt_uint8_t id_recv[16];
         uint16_t memory_type_capacity;
@@ -694,28 +699,14 @@ rt_err_t w25x80_init(const char * flash_device_name, const char * spi_device_nam
         rt_spi_send(spi_flash_device.rt_spi_device, &cmd, 1);
 
         /* read flash id */
-//        cmd = CMD_JEDEC_ID;
-        cmd = CMD_RP_ID;
+        cmd = CMD_JEDEC_ID;
         rt_memset(id_recv, 0, sizeof(id_recv));
-        
-        MY_DEBUG("\n\r");
-        for(i = 0; i < 16; i++) {
-            MY_DEBUG("%02X ", id_recv[i]);
-        }
-        MY_DEBUG("\n\r");
-  
+       
         /*get ID*/      
         rt_spi_send_then_recv(spi_flash_device.rt_spi_device, &cmd, 1, id_recv, 3);
 
         flash_unlock(&spi_flash_device);
         
-        MY_DEBUG("\n\r");
-        for(i = 0; i < 16; i++) {
-            MY_DEBUG("%02X ", id_recv[i]);
-        }
-        MY_DEBUG("\n\r");
-//        MY_DEBUG("%s, %d: read data from w25x80 flash:  %s\n\r",__func__,__LINE__,id_recv);
-
         if(id_recv[0] != MF_ID)
         {
             FLASH_TRACE("Manufacturers ID error!\r\n");
@@ -725,12 +716,13 @@ rt_err_t w25x80_init(const char * flash_device_name, const char * spi_device_nam
 
         /* SECTOR_SIZE */
         spi_flash_device.geometry.bytes_per_sector = SECTOR_SIZE;
-        spi_flash_device.geometry.block_size = 4096; /* block erase: 4k */
+        spi_flash_device.geometry.block_size = 65536UL; /* block erase: 4k */
 
         /* get memory type and capacity */
         memory_type_capacity = id_recv[1];
         memory_type_capacity = (memory_type_capacity << 8) | id_recv[2];
 
+        MY_DEBUG("%s, %d: memory_type_capacity = 0x%02X\n",__func__,__LINE__,memory_type_capacity);
         /* sector_count */
         if(memory_type_capacity == MTC_W25Q128_BV)
         {
@@ -766,6 +758,12 @@ rt_err_t w25x80_init(const char * flash_device_name, const char * spi_device_nam
         {
             FLASH_TRACE("W25Q16DW detection\r\n");
             spi_flash_device.geometry.sector_count = 512;
+        }
+        else if(memory_type_capacity == MTC_W25X80_TY)
+        {
+          MY_DEBUG("%s, %d: This is W25x80...\r\n",__func__,__LINE__);
+          spi_flash_device.geometry.sector_count = 512;
+          return -RT_ENOSYS;
         }
         else
         {

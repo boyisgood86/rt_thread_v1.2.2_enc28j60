@@ -49,7 +49,7 @@
 #endif
 
 #ifndef SECTOR_SIZE
-#define SECTOR_SIZE              512
+#define SECTOR_SIZE              4096
 #endif
 
 #ifndef DFS_FILESYSTEM_TYPES_MAX

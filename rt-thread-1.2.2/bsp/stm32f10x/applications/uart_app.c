@@ -72,18 +72,27 @@ void uart_tcp(void)
 {
   struct rt_spi_device * rt_spi_device;
   int err  =-1;
+   int cmd = 0x55;
   
   int read_size = -1;
   if (client_sock < 0) {
     return ;
   }
   
-//  /*just test spi20*/
-//  rt_spi_device = (struct rt_spi_device *)rt_device_find("spi21");
-//  if(rt_spi_device != RT_NULL) {
-//    MY_DEBUG("%s, %d: ------------> find spi20!\n\r",__func__,__LINE__);
-//  }else MY_DEBUG("%s, %d:----------->can't find spi21 !\n\r",__func__,__LINE__);
-//  
+  /*just test spi20*/
+  rt_spi_device = (struct rt_spi_device *)rt_device_find("spi20");
+  if(rt_spi_device != RT_NULL) {
+    MY_DEBUG("%s, %d: ------------> find spi20!\n\r",__func__,__LINE__);
+  }else MY_DEBUG("%s, %d:----------->can't find spi21 !\n\r",__func__,__LINE__);
+  
+  
+   
+  
+  
+//  while(1) {
+//    rt_spi_send(rt_spi_device, &cmd, 1);
+//  }
+  
   //TODO..
   if(!usart_device) {
     if(find_uart(usart_device, USART) != UART_OK) {
