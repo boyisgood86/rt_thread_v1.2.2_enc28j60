@@ -38,6 +38,7 @@ rt_err_t rt_spi_bus_register(struct rt_spi_bus       *bus,
 {
     rt_err_t result;
 
+    MY_DEBUG("%s, %d: Now at here..\n\r",__func__,__LINE__);
     result = rt_spi_bus_device_init(bus, name);
     if (result != RT_EOK)
         return result;

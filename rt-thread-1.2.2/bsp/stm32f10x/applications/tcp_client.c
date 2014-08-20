@@ -11,6 +11,13 @@
 
 #define CLIENT_PORT     (10030)
 
+
+#define     USART        ("uart1") 
+#define     NAME_NULL    ("name_null")
+#define     NO_UART      ("no_uart")
+#define     UART_OK      ("uart_ok")
+
+
 enum VAL {
  KEEP_ALIVE = 1,
  TRUE = 0,
@@ -28,6 +35,10 @@ int recv_bytes = -1;
 
 
 extern struct rt_mutex socket_mutex;
+extern struct rt_mutex uart_mutex;
+extern rt_device_t usart_device;
+
+extern char * find_uart(rt_device_t device, const char *name);
 
 
 /*deal with data which recvived from remote tcp server*/
@@ -45,21 +56,32 @@ int deal_data(const char *s, int bytes)
     buff[i] = *p++ ;
   }
   
-  //check
-  if(buff[0] != 0xfe || buff[15] != 0x23) {
-    MY_DEBUG("%s, %d: data error..\n\r",__func__,__LINE__);
-    return (int)DATA_ERR;
+  if(!usart_device) {
+    if(find_uart(usart_device, USART) != UART_OK) {
+      MY_DEBUG("%s, %d: No uart 1 ..\n\r",__func__,__LINE__);
+      return FALSE;
+    }
   }
-  //if read
-  if(buff[10] == 0xF1) {
-    MY_DEBUG("%s, %d: Now read data from file.xml..\n\r",__func__,__LINE__);
-    //read data from file.xml
-    //TODO...
-  }else if(buff[10] == 0xF0) {
-    MY_DEBUG("%s, %d: Now call uart write function...\n\r",__func__,__LINE__);
-    //write data to uart 1
-    //TODO...
-  }
+  rt_mutex_take(&uart_mutex,RT_WAITING_FOREVER);
+  rt_device_write(usart_device, 0, buff, (bytes - 1));
+  rt_mutex_release(&uart_mutex);
+  MY_DEBUG("\n\r");
+  
+//  //check
+//  if(buff[0] != 0xfe || buff[15] != 0x23) {
+//    MY_DEBUG("%s, %d: data error..\n\r",__func__,__LINE__);
+//    return (int)DATA_ERR;
+//  }
+//  //if read
+//  if(buff[10] == 0xF1) {
+//    MY_DEBUG("%s, %d: Now read data from file.xml..\n\r",__func__,__LINE__);
+//    //read data from file.xml
+//    //TODO...
+//  }else if(buff[10] == 0xF0) {
+//    MY_DEBUG("%s, %d: Now call uart write function...\n\r",__func__,__LINE__);
+//    //write data to uart 1
+//    //TODO...
+//  }
   
   return (int)TRUE;
 }

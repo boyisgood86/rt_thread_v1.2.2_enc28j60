@@ -32,14 +32,15 @@
 
 
 
-rt_device_t usart_device = NULL;
+rt_device_t usart_device = RT_NULL;
 
 
 
 
 
 unsigned char tx_buff[] = "Hello, I/m usart 1 ,just demo !\n\r";
-char rx_buff[LEN];
+char uart_buff[LEN];
+//char rx_buff[LEN];
 
 extern struct rt_mutex socket_mutex;
 extern struct rt_mutex uart_mutex;
@@ -66,35 +67,65 @@ char * find_uart(rt_device_t device, const char *name)
 }
 
 
-
-
-
-
-
-
-
-
-
 /*uart to tcp */
 void uart_tcp(void)
 {
+  struct rt_spi_device * rt_spi_device;
   int err  =-1;
+  
+  int read_size = -1;
   if (client_sock < 0) {
     return ;
   }
-  err = rt_mutex_take(&socket_mutex,1000);
-  if(err < 0) {
-    MY_DEBUG("%s, %d: No socket mutex..\n\r",__func__,__LINE__);
-    return ;
+  
+//  /*just test spi20*/
+//  rt_spi_device = (struct rt_spi_device *)rt_device_find("spi21");
+//  if(rt_spi_device != RT_NULL) {
+//    MY_DEBUG("%s, %d: ------------> find spi20!\n\r",__func__,__LINE__);
+//  }else MY_DEBUG("%s, %d:----------->can't find spi21 !\n\r",__func__,__LINE__);
+//  
+  //TODO..
+  if(!usart_device) {
+    if(find_uart(usart_device, USART) != UART_OK) {
+        return ;
+    }
   }
-  err = send(client_sock, tx_buff, sizeof(tx_buff), 0);
-  rt_mutex_release(&socket_mutex);
-  if(err < 0) {
-    MY_DEBUG("%s, %d: send faild !\n\r",__func__,__LINE__);
-    lwip_close(client_sock);
-    client_sock = -1;
-    return ;
-  }
+  
+  rt_memset(uart_buff, 0, sizeof(uart_buff));
+  
+  rt_mutex_take(&uart_mutex,RT_WAITING_FOREVER);
+  read_size = rt_device_read(usart_device, 0, uart_buff, LEN);
+  rt_mutex_release(&uart_mutex);
+  
+  if(read_size > 0) {
+       err = rt_mutex_take(&socket_mutex,1000);
+      if(err < 0) {
+        MY_DEBUG("%s, %d: No socket mutex..\n\r",__func__,__LINE__);
+        return ;
+      }
+      err = send(client_sock, uart_buff, read_size, 0);
+      rt_mutex_release(&socket_mutex);
+      if(err < 0) {
+        MY_DEBUG("%s, %d: send faild !\n\r",__func__,__LINE__);
+        lwip_close(client_sock);
+        client_sock = -1;
+        return ;
+      } 
+  } 
+  
+//  err = rt_mutex_take(&socket_mutex,1000);
+//  if(err < 0) {
+//    MY_DEBUG("%s, %d: No socket mutex..\n\r",__func__,__LINE__);
+//    return ;
+//  }
+//  err = send(client_sock, tx_buff, sizeof(tx_buff), 0);
+//  rt_mutex_release(&socket_mutex);
+//  if(err < 0) {
+//    MY_DEBUG("%s, %d: send faild !\n\r",__func__,__LINE__);
+//    lwip_close(client_sock);
+//    client_sock = -1;
+//    return ;
+//  }
   //TODO..
 }
 

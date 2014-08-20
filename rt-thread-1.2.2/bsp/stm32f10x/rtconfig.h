@@ -3,7 +3,7 @@
 #define __RTTHREAD_CFG_H__
 
 
-/*add by myself */
+/****************************add by myself **************************************/
 
 #define _DEUBG	(1)
 
@@ -17,7 +17,10 @@
 #define TCP_CLIENT
 #define UART_TO_TCP
 
+#define 	RT_USING_SPI  
 
+
+/*******************************add by jason *******************************/
 //#define DM9000
 
 /* RT_NAME_MAX*/

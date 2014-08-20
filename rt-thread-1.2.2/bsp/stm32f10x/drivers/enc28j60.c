@@ -812,7 +812,7 @@ void rt_hw_enc28j60_init()
 	RCC_Configuration();
 	NVIC_Configuration();
 	GPIO_Configuration();
-        SPI_Configuration();
+    SPI_Configuration();
  //       SPI_Disable_OtherDev();                     // 静止其他SPI设备
     
 	/* init rt-thread device interface */

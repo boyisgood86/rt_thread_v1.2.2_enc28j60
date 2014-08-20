@@ -115,6 +115,8 @@ void cali_store(struct calibration_data *data)
                data->max_y);
 }
 #endif /* RT_USING_RTGUI */
+
+extern void rt_hw_spi2_init(void);
 void rt_init_thread_entry(void* parameter)
 {
 #ifdef RT_USING_COMPONENTS_INIT
@@ -126,6 +128,12 @@ void rt_init_thread_entry(void* parameter)
     finsh_set_device(RT_CONSOLE_DEVICE_NAME);
 #endif  /* RT_USING_FINSH */
 
+    {
+        rt_hw_spi2_init();
+        if(w25x80_init("flash0", "spi20") != RT_EOK) {
+          MY_DEBUG("%s, %d: w25x80 init faild !\n\r",__func__,__LINE__);
+        }
+    }
     /* Filesystem Initialization */
 #if defined(RT_USING_DFS) && defined(RT_USING_DFS_ELMFAT)
     /* mount sd card fat partition 1 as root directory */
