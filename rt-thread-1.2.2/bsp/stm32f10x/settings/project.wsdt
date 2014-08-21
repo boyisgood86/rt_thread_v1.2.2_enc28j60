@@ -25,7 +25,7 @@
     <Windows>
       
       
-    <Wnd0>
+    <Wnd2>
         <Tabs>
           <Tab>
             <Identity>TabID-25582-10308</Identity>
@@ -33,11 +33,11 @@
             <Factory>Workspace</Factory>
             <Session>
               
-            <NodeDict><ExpandedNode>project</ExpandedNode><ExpandedNode>project/Components</ExpandedNode><ExpandedNode>project/Filesystem</ExpandedNode></NodeDict></Session>
+            <NodeDict><ExpandedNode>project</ExpandedNode><ExpandedNode>project/Applications</ExpandedNode></NodeDict></Session>
           </Tab>
         </Tabs>
         
-      <SelectedTab>0</SelectedTab></Wnd0><Wnd1>
+      <SelectedTab>0</SelectedTab></Wnd2><Wnd3>
         <Tabs>
           <Tab>
             <Identity>TabID-7348-11059</Identity>
@@ -47,20 +47,20 @@
           </Tab>
         <Tab><Identity>TabID-7097-14544</Identity><TabName>Find in Files</TabName><Factory>Find-in-Files</Factory><Session/></Tab><Tab><Identity>TabID-32696-5040</Identity><TabName>Ambiguous Definitions</TabName><Factory>Select-Ambiguous-Definitions</Factory><Session/></Tab><Tab><Identity>TabID-165-29676</Identity><TabName>Debug Log</TabName><Factory>Debug-Log</Factory><Session/></Tab><Tab><Identity>TabID-12975-10057</Identity><TabName>Declarations</TabName><Factory>Find-All-Declarations</Factory><Session/></Tab></Tabs>
         
-      <SelectedTab>0</SelectedTab></Wnd1></Windows>
+      <SelectedTab>0</SelectedTab></Wnd3></Windows>
     <Editor>
       
       
       
       
-    <Pane><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\applications\application.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>81</YPos2><SelStart2>2352</SelStart2><SelEnd2>2352</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\applications\uart_app.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>76</YPos2><SelStart2>1800</SelStart2><SelEnd2>2006</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\applications\startup.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>81</YPos2><SelStart2>2419</SelStart2><SelEnd2>2419</SelEnd2></Tab><ActiveTab>2</ActiveTab></Pane><ActivePane>0</ActivePane><Pane/><Sizes><Pane><X>927977</X><Y>1000000</Y></Pane><Pane><X>72022</X><Y>1000000</Y></Pane></Sizes><SplitMode>4</SplitMode></Editor>
+    <Pane><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\applications\application.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>193</YPos2><SelStart2>5427</SelStart2><SelEnd2>5427</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\applications\uart_app.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>47</YPos2><SelStart2>1446</SelStart2><SelEnd2>1446</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\applications\startup.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>81</YPos2><SelStart2>2301</SelStart2><SelEnd2>2301</SelEnd2></Tab><ActiveTab>2</ActiveTab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\applications\filesystem.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>1</YPos2><SelStart2>347</SelStart2><SelEnd2>347</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\applications\filesystem.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>0</YPos2><SelStart2>121</SelStart2><SelEnd2>121</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\rtconfig.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>0</YPos2><SelStart2>449</SelStart2><SelEnd2>449</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\..\components\net\lwip-1.4.1\src\lwipopts.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>201</YPos2><SelStart2>6960</SelStart2><SelEnd2>6960</SelEnd2></Tab></Pane><ActivePane>0</ActivePane><Pane/><Sizes><Pane><X>927977</X><Y>1000000</Y></Pane><Pane><X>72022</X><Y>1000000</Y></Pane></Sizes><SplitMode>4</SplitMode></Editor>
     <Positions>
       
       
       
       
       
-    <Top><Row0><Sizes><Toolbar-00EAF140><key>iaridepm.enu1</key></Toolbar-00EAF140></Sizes></Row0><Row1><Sizes/></Row1></Top><Left><Row0><Sizes><Wnd0><Rect><Top>-2</Top><Left>-2</Left><Bottom>459</Bottom><Right>275</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>167</yscreen><sizeHorzCX>147059</sizeHorzCX><sizeHorzCY>243440</sizeHorzCY><sizeVertCX>203676</sizeVertCX><sizeVertCY>672012</sizeVertCY></Rect></Wnd0></Sizes></Row0></Left><Right><Row0><Sizes/></Row0></Right><Bottom><Row0><Sizes><Wnd1><Rect><Top>-2</Top><Left>-2</Left><Bottom>182</Bottom><Right>1362</Right><x>-2</x><y>-2</y><xscreen>1364</xscreen><yscreen>184</yscreen><sizeHorzCX>1002941</sizeHorzCX><sizeHorzCY>268222</sizeHorzCY><sizeVertCX>147059</sizeVertCX><sizeVertCY>243440</sizeVertCY></Rect></Wnd1></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
+    <Top><Row0><Sizes><Toolbar-01C8F140><key>iaridepm.enu1</key></Toolbar-01C8F140></Sizes></Row0><Row1><Sizes/></Row1></Top><Left><Row0><Sizes><Wnd2><Rect><Top>-2</Top><Left>-2</Left><Bottom>458</Bottom><Right>275</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>167</yscreen><sizeHorzCX>147059</sizeHorzCX><sizeHorzCY>243440</sizeHorzCY><sizeVertCX>203676</sizeVertCX><sizeVertCY>670554</sizeVertCY></Rect></Wnd2></Sizes></Row0></Left><Right><Row0><Sizes/></Row0></Right><Bottom><Row0><Sizes><Wnd3><Rect><Top>-2</Top><Left>-2</Left><Bottom>183</Bottom><Right>1362</Right><x>-2</x><y>-2</y><xscreen>1364</xscreen><yscreen>185</yscreen><sizeHorzCX>1002941</sizeHorzCX><sizeHorzCY>269679</sizeHorzCY><sizeVertCX>147059</sizeVertCX><sizeVertCY>243440</sizeVertCY></Rect></Wnd3></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
   </Desktop>
 </Workspace>
 

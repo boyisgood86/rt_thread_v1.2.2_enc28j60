@@ -99,6 +99,15 @@ static void uart_tcp_thread(void *arg)
   }
 }
 
+extern void file_op(void);
+static void file_test_thread(void *arg)
+{
+  while(1) {
+    file_op();
+    rt_thread_delay(1000);
+  }
+}
+
 #ifdef RT_USING_RTGUI
 rt_bool_t cali_setup(void)
 {
@@ -146,8 +155,8 @@ void rt_init_thread_entry(void* parameter)
     }
     else {
         rt_kprintf("File System initialzation failed!\n");
-//        mkfs("elm", "flash0");  /* 如果是spi flash 第一次使用，则打开这里，进行格式化 */
-//        MY_DEBUG("mkfs File System\n\r");
+        mkfs("elm", "flash0");  /* 如果是spi flash 第一次使用，则打开这里，进行格式化 */
+        MY_DEBUG("mkfs File System\n\r");
     }
 #endif  /* RT_USING_DFS */
 
@@ -196,6 +205,10 @@ void rt_init_thread_entry(void* parameter)
     #ifdef UART_TO_TCP
           sys_thread_new("tcp_uart", uart_tcp_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);    
     #endif /*UART_TO_TCP*/
+          
+    #ifdef FILE_TEST
+          sys_thread_new("file_test", file_test_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);    
+    #endif /* FILE_TEST */
 
 #endif /*RT_USING_LWIP*/
 }
@@ -219,6 +232,7 @@ int rt_application_init(void)
 //    {
 //        rt_thread_startup(&led_thread);
 //    }
+    
 
 #if (RT_THREAD_PRIORITY_MAX == 32)
     init_thread = rt_thread_create("init",

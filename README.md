@@ -43,3 +43,16 @@ A  	#define  TCP_KEEPIDLE_DEFAULT     3000UL  /*7200000 ms ---> 3000ms*/
 B  	#define  TCP_KEEPINTVL_DEFAULT    1000UL	/*75000  ms ---> 1000ms*/
 
 C   #define  TCP_KEEPCNT_DEFAULT      3U      /*9次 --> 3次*/
+
+
+------------------------
+
+2014-8-21 增加内容如下：
+
+1  SPI 2 的驱动注册进入了rtt驱动框架 rt_hw_SPI2_init()
+
+2  添加 W25X80 spi flash 驱动 <来自于 https://github.com/boyisgood86/realtouch-stm32f4 中的w25qxx 驱动，仅仅是修改了一下扇区、页、容量>
+
+3  挂载文件系统 ELMFAT 成功 dfs_init() elm_init() mount...
+
+4  文件读写测试通过   在rtconfig.h 文件中打开 FILE_TEST 宏即可测试。在 init 主线程中测试。

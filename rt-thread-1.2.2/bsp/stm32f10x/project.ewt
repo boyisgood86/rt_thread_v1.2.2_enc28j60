@@ -176,6 +176,9 @@
       <name>$PROJ_DIR$\applications\application.c</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\applications\filesystem.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\applications\startup.c</name>
     </file>
     <file>

@@ -17,7 +17,8 @@
 #define TCP_CLIENT
 #define UART_TO_TCP
 
-#define 	RT_USING_SPI  
+#define 	RT_USING_SPI 
+#define     FILE_TEST
 
 
 /*******************************add by jason *******************************/
