@@ -13,11 +13,12 @@
 #define MY_DEBUG(fmt, args...)	do{;}while(0)
 #endif
 
-#define ENC28J60
-#define TCP_CLIENT
-#define UART_TO_TCP
-
 #define 	RT_USING_SPI 
+#define     ENC28J60
+
+#define     TCP_CLIENT
+#define     UART_TO_TCP
+#define     UDP_SERVER
 #define     FILE_TEST
 
 
@@ -140,7 +141,7 @@
 #define RT_LWIP_TCP_PCB_NUM	5
 
 /* Using DHCP */
-// #define RT_LWIP_DHCP 
+ #define RT_LWIP_DHCP 
 
 /* ip address of target*/
 #define RT_LWIP_IPADDR0	192

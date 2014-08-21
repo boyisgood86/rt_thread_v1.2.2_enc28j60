@@ -6,8 +6,11 @@
 
 #define LEN     (256)
 
-#define TEST_IP     ("192.168.1.123")
-#define TEST_PORT   (10000)
+//#define TEST_IP     ("192.168.1.123")
+//#define TEST_PORT   (10000)
+
+#define TEST_IP     ("192.168.1.199")
+#define TEST_PORT   (9988)
 
 #define CLIENT_PORT     (10030)
 
@@ -27,7 +30,7 @@ enum VAL {
  FALSE_KEEPALIVE = -102,
 };
 
-unsigned char send_data[] = "Hello,I/m clinet, just test !";
+unsigned char send_data[] = "Hello";
 char recv_buff[LEN];
 
 int client_sock = -1;
@@ -233,7 +236,7 @@ int client_hearbet(void)
               client_sock = -1;
               return FALSE;              
             }else {
-              if(strncmp("Hello client", heart_buff, 13) == 0) {
+              if(strncmp("Hello", heart_buff, 6) == 0) {
                 MY_DEBUG("%s, %d: recv data from server : %s\n\r",__func__,__LINE__,heart_buff);
                 FD_CLR(client_sock,&readset);
                 return TRUE;
@@ -321,42 +324,52 @@ void tcp_client(void)
             client_sock = -1;          
             MY_DEBUG("tcp client restart..\n\r");
             return ;
+        }else {
+            MY_DEBUG("%s, %d: recv server data is : %s \n\r",__func__,__LINE__,client_buff);
+            rt_mutex_take(&socket_mutex,RT_WAITING_FOREVER);
+            if(send(client_sock, client_buff, LEN, 0) < 0) {
+               lwip_close(client_sock);
+               client_sock = -1;
+                rt_mutex_release(&socket_mutex);
+                return ;
+            }
+            rt_mutex_release(&socket_mutex);
         }
         //do data
-        timeout_count = 0;
-        MY_DEBUG("%s, %d: recv data from remote server : %s\n\r",__func__,__LINE__,client_buff);
-        retval = deal_data(client_buff, recv_bytes);
-        if(retval == TRUE) {
-          MY_DEBUG("%s, %d: OK! \n\r",__func__,__LINE__);
-          continue ;
-        }else if(retval == DATA_ERR) {
-          
-          rt_mutex_take(&socket_mutex,RT_WAITING_FOREVER);
-          if(send(client_sock, err_back, sizeof(err_back), 0) < 0) {
-            lwip_close(client_sock);
-            client_sock = -1;
-            rt_mutex_release(&socket_mutex);
-            return ;
-          }
-          rt_mutex_release(&socket_mutex);
-        }
+//        timeout_count = 0;
+//        MY_DEBUG("%s, %d: recv data from remote server : %s\n\r",__func__,__LINE__,client_buff);
+//        retval = deal_data(client_buff, recv_bytes);
+//        if(retval == TRUE) {
+//          MY_DEBUG("%s, %d: OK! \n\r",__func__,__LINE__);
+//          continue ;
+//        }else if(retval == DATA_ERR) {
+//          
+//          rt_mutex_take(&socket_mutex,RT_WAITING_FOREVER);
+//          if(send(client_sock, err_back, sizeof(err_back), 0) < 0) {
+//            lwip_close(client_sock);
+//            client_sock = -1;
+//            rt_mutex_release(&socket_mutex);
+//            return ;
+//          }
+//          rt_mutex_release(&socket_mutex);
+//        }
       }
       //must ?
-      timeout_count++;
+//      timeout_count++;
       FD_CLR(client_sock,&readset);
-      if(timeout_count == 100000UL) {
-        timeout_count = 0;
-        rt_mutex_take(&socket_mutex,RT_WAITING_FOREVER);
-        err = client_hearbet();
-        rt_mutex_release(&socket_mutex);
-        if(err == FALSE){
-          MY_DEBUG("%s, %d: send heartbeat faild !\n\r",__func__,__LINE__);
-          lwip_close(client_sock);
-          client_sock = -1;          
-          
-        }
-         return ;
-      }
+//      if(timeout_count == 100000UL) {
+//        timeout_count = 0;
+//        rt_mutex_take(&socket_mutex,RT_WAITING_FOREVER);
+//        err = client_hearbet();
+//        rt_mutex_release(&socket_mutex);
+//        if(err == FALSE){
+//          MY_DEBUG("%s, %d: send heartbeat faild !\n\r",__func__,__LINE__);
+//          lwip_close(client_sock);
+//          client_sock = -1;          
+//          
+//        }
+//         return ;
+//      }
     }
   }
 }
@@ -450,4 +463,4 @@ void tcp_client(void)
 //    client_sock = -1;
 //    return ;  
 //}
-//
+

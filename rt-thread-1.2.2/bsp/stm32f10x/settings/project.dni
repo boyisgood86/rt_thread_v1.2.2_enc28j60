@@ -33,7 +33,7 @@ Stop=1
 Freq=10000000
 MultiCoreRunAll=1
 [DebugChecksum]
-Checksum=1186862983
+Checksum=805300806
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -63,7 +63,8 @@ mode=0
 [Breakpoints2]
 Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\drivers\spi.c}.7.1" 0 0 1 "" 0 "" 0
 Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\applications\filesystem.c}.21.4" 0 0 1 "" 0 "" 0
-Count=2
+Bp2=_ 0 "EMUL_CODE" "{$PROJ_DIR$\applications\tcp_client.c}.201.3" 0 0 1 "" 0 "" 0
+Count=3
 [Aliases]
 Count=0
 SuppressDialog=0

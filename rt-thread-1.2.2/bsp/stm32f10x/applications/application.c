@@ -80,13 +80,13 @@ struct rt_mutex socket_mutex;
 struct rt_mutex uart_mutex;
 
 extern void tcp_client(void);
-
 static void tcp_client_thread(void *arg)
 {
   
   while(1) {
+    rt_thread_delay(500);
     tcp_client();
-    rt_thread_delay(3000);
+    rt_thread_delay(5000);
   }
 }
 
@@ -94,8 +94,8 @@ extern void uart_tcp(void);
 static void uart_tcp_thread(void *arg)
 {
   while(1) {
+    rt_thread_delay(500);
     uart_tcp();
-    rt_thread_delay(1000);
   }
 }
 
@@ -103,10 +103,20 @@ extern void file_op(void);
 static void file_test_thread(void *arg)
 {
   while(1) {
+    rt_thread_delay(3000);
     file_op();
-    rt_thread_delay(1000);
   }
 }
+
+extern void udp_server(void);
+static void udp_server_thread(void *arg)
+{
+  while(1) {
+    rt_thread_delay(1000);
+    udp_server();
+  }
+}
+
 
 #ifdef RT_USING_RTGUI
 rt_bool_t cali_setup(void)
@@ -201,6 +211,10 @@ void rt_init_thread_entry(void* parameter)
     #ifdef  TCP_CLIENT
           sys_thread_new("tcp_client", tcp_client_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);
     #endif   /*TCP_CLIENT*/
+          
+    #ifdef UDP_SERVER
+          sys_thread_new("udp_server", udp_server_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);    
+    #endif /* UDP_SERVER */
           
     #ifdef UART_TO_TCP
           sys_thread_new("tcp_uart", uart_tcp_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);    

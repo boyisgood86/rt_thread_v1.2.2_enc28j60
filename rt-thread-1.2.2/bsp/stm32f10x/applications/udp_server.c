@@ -1,7 +1,8 @@
 #include <rtthread.h>
 #include <lwip/netdb.h> 
 #include <lwip/sockets.h>
-
+//#include "netif/etharp.h"
+//#include "netif/ethernetif.h"
 
 
 #define LEN     (256)
@@ -10,6 +11,9 @@
 #define UDP_PORT   (10010)
 
 
+
+/** The list of network interfaces. */
+extern struct netif *netif_list;
 /*udp server*/
 void udp_server(void)
 {
@@ -17,11 +21,14 @@ void udp_server(void)
   int udp_sock = -1;
   int recv_bytes = -1;
   rt_uint32_t addr_len;
+  socklen_t addrlen;
   
   char udp_recv_buff[LEN];
   
   struct sockaddr_in server_addr;
-  struct sockaddr_in client_addr; 
+  struct sockaddr_in client_addr;
+//  struct netif * netif;
+//  struct ifconf ifconf;
   
   MY_DEBUG("Now in  %s, %d\n\r",__func__,__LINE__);
   
@@ -31,6 +38,16 @@ void udp_server(void)
     goto OUT;
   }
 
+//   /*get ip add */
+//  addrlen = sizeof(server_addr.sin_zero);
+//  if(getsockname(udp_sock, (struct sockaddr *)&server_addr,&addrlen) < 0){
+//    MY_DEBUG("%s, %d: get ip add faild !\n\r",__func__,__LINE__);
+//  }else {
+//    MY_DEBUG("%s, %d: my host ip is : %s\n\r",__func__,__LINE__, inet_ntoa( server_addr.sin_addr.s_addr));
+//    MY_DEBUG("%s, %d: my host port is : %d\n\r",__func__,__LINE__, (int) ntohs(server_addr.sin_port));
+//  }
+  
+    list_if();
   /*setsockopt*/
   err = setsockopt(udp_sock, SOL_SOCKET, 
                    SO_REUSEADDR, 
@@ -54,6 +71,16 @@ void udp_server(void)
                 MY_DEBUG("bind client faild\n\r");
                 goto OUT;
               }
+  
+  
+  /*get ip add */
+  addrlen = sizeof(server_addr);
+  if(getsockname(udp_sock, (struct sockaddr *)&server_addr,&addrlen) < 0){
+    MY_DEBUG("%s, %d: get ip add faild !\n\r",__func__,__LINE__);
+  }else {
+    MY_DEBUG("%s, %d: my host ip is : %s\n\r",__func__,__LINE__, inet_ntoa( server_addr.sin_addr));
+    MY_DEBUG("%s, %d: my host port is : %d\n\r",__func__,__LINE__, (int) ntohs(server_addr.sin_port));
+  }
   
   MY_DEBUG("Wate dta,udp:  %s, %d\n\r",__func__,__LINE__);
   /*recvfrom*/
