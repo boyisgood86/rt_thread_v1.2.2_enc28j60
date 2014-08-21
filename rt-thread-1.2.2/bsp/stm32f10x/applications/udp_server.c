@@ -96,7 +96,7 @@ void udp_server(void)
     MY_DEBUG("\n(%s , %d) said : ",inet_ntoa(client_addr.sin_addr),ntohs(client_addr.sin_port));
     MY_DEBUG("%s\n\r", udp_recv_buff);
 
-    recv_bytes =  sendto(udp_sock, udp_recv_buff, sizeof(udp_recv_buff), 0,
+    recv_bytes =  sendto(udp_sock, "tcp server port is 10020 ", 32, 0,
               (struct sockaddr*)&client_addr, sizeof(struct sockaddr));    
    
     if(recv_bytes < 0) {

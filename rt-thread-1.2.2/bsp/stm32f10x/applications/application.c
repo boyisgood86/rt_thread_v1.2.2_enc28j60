@@ -86,7 +86,7 @@ static void tcp_client_thread(void *arg)
   while(1) {
     rt_thread_delay(500);
     tcp_client();
-    rt_thread_delay(5000);
+    rt_thread_delay(30000);
   }
 }
 
@@ -117,6 +117,14 @@ static void udp_server_thread(void *arg)
   }
 }
 
+extern void tcp_server(void);
+static void tcp_server_thread(void *arg)
+{
+  while(1) {
+     rt_thread_delay(500);
+     tcp_server();
+  }
+}
 
 #ifdef RT_USING_RTGUI
 rt_bool_t cali_setup(void)
@@ -215,6 +223,10 @@ void rt_init_thread_entry(void* parameter)
     #ifdef UDP_SERVER
           sys_thread_new("udp_server", udp_server_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);    
     #endif /* UDP_SERVER */
+          
+#ifdef TCP_SERVER
+          sys_thread_new("tcp_server", tcp_server_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);
+#endif /* TCP_SERVER */
           
     #ifdef UART_TO_TCP
           sys_thread_new("tcp_uart", uart_tcp_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);    
