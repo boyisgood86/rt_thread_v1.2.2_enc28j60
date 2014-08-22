@@ -29,7 +29,7 @@
 #define HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the `localtime_r' function. */
-#define HAVE_LOCALTIME_R 1
+#define HAVE_LOCALTIME_R 0  /* change by jason */
 
 /* Define to 1 if you have the `localtime_s' function. */
 /* #undef HAVE_LOCALTIME_S */

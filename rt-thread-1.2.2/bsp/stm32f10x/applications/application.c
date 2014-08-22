@@ -43,35 +43,48 @@
 #include "led.h"
 
 ALIGN(RT_ALIGN_SIZE)
-//static rt_uint8_t led_stack[ 512 ];
-//static struct rt_thread led_thread;
-//static void led_thread_entry(void* parameter)
+static rt_uint8_t led_stack[ 512 ];
+static struct rt_thread led_thread;
+static void led_thread_entry(void* parameter)
+{
+    unsigned int count=0;
+
+    rt_hw_led_init();
+
+    while (1)
+    {
+        /* led1 on */
+      MY_DEBUG("led on....\n\r");
+      rt_thread_delay( RT_TICK_PER_SECOND/2 ); /* sleep 0.5 second and switch to other thread */
+      MY_DEBUG("led off...\n\r");
+      rt_thread_delay( RT_TICK_PER_SECOND/2 ); /* sleep 0.5 second and switch to other thread */
+//#ifndef RT_USING_FINSH
+//        rt_kprintf("led on, count : %d\r\n",count);
+//#endif
+//        count++;
+//        rt_hw_led_on(0);
+//        rt_thread_delay( RT_TICK_PER_SECOND/2 ); /* sleep 0.5 second and switch to other thread */
+//
+//        /* led1 off */
+//#ifndef RT_USING_FINSH
+//        rt_kprintf("led off\r\n");
+//#endif
+//        rt_hw_led_off(0);
+//        rt_thread_delay( RT_TICK_PER_SECOND/2 );
+    }
+}
+
+
+//static rt_uint8_t db_test_stack[ 512 ];
+//static struct rt_thread db_test_thread;
+//extern void test_db(void);
+//static void db_test_thread_entry(void *arg)
 //{
-//    unsigned int count=0;
-//
-//    rt_hw_led_init();
-//
-//    while (1)
-//    {
-//        /* led1 on */
-//      MY_DEBUG("led on....\n\r");
-//      rt_thread_delay( RT_TICK_PER_SECOND/2 ); /* sleep 0.5 second and switch to other thread */
-//      MY_DEBUG("led off...\n\r");
-//      rt_thread_delay( RT_TICK_PER_SECOND/2 ); /* sleep 0.5 second and switch to other thread */
-////#ifndef RT_USING_FINSH
-////        rt_kprintf("led on, count : %d\r\n",count);
-////#endif
-////        count++;
-////        rt_hw_led_on(0);
-////        rt_thread_delay( RT_TICK_PER_SECOND/2 ); /* sleep 0.5 second and switch to other thread */
-////
-////        /* led1 off */
-////#ifndef RT_USING_FINSH
-////        rt_kprintf("led off\r\n");
-////#endif
-////        rt_hw_led_off(0);
-////        rt_thread_delay( RT_TICK_PER_SECOND/2 );
-//    }
+//  MY_DEBUG("%s, %d:---------------->",__func__,__LINE__);
+//  while(1) {
+//    rt_thread_delay(500);
+//    test_db();
+//  }
 //}
 
 /*socket mutex*/
@@ -84,9 +97,9 @@ static void tcp_client_thread(void *arg)
 {
   
   while(1) {
-    rt_thread_delay(500);
+    rt_thread_delay(5000);
     tcp_client();
-    rt_thread_delay(30000);
+    
   }
 }
 
@@ -125,6 +138,16 @@ static void tcp_server_thread(void *arg)
      tcp_server();
   }
 }
+
+//extern void test_db(void);
+//static void db_test_thread(void *arg)
+//{
+//  while(1) {
+//    rt_thread_delay(500);
+//    test_db();
+//  }
+//}
+
 
 #ifdef RT_USING_RTGUI
 rt_bool_t cali_setup(void)
@@ -236,6 +259,10 @@ void rt_init_thread_entry(void* parameter)
           sys_thread_new("file_test", file_test_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);    
     #endif /* FILE_TEST */
 
+    #ifdef RT_USING_SQLITE
+//          sys_thread_new("db_test", db_test_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);
+    #endif /* RT_USING_SQLITE */          
+          
 #endif /*RT_USING_LWIP*/
 }
 
@@ -243,23 +270,41 @@ int rt_application_init(void)
 {
     rt_thread_t init_thread;
 
-//    rt_err_t result;
+    rt_err_t result;
 
+    /* init led thread */
+    result = rt_thread_init(&led_thread,
+                            "led",
+                            led_thread_entry,
+                            RT_NULL,
+                            (rt_uint8_t*)&led_stack[0],
+                            sizeof(led_stack),
+                            20,
+                            5);
+    if (result == RT_EOK)
+    {
+        rt_thread_startup(&led_thread);
+    }else {
+      MY_DEBUG("%s, %d: Led thread faild !\n\r",__func__,__LINE__);
+    }
+    
+//    rt_err_t result;
+//
 //    /* init led thread */
-//    result = rt_thread_init(&led_thread,
-//                            "led",
-//                            led_thread_entry,
+//    result = rt_thread_init(&db_test_thread,
+//                            "db_test",
+//                            db_test_thread_entry,
 //                            RT_NULL,
-//                            (rt_uint8_t*)&led_stack[0],
-//                            sizeof(led_stack),
+//                            (rt_uint8_t*)&db_test_stack[0],
+//                            sizeof(db_test_stack),
 //                            20,
 //                            5);
 //    if (result == RT_EOK)
 //    {
-//        rt_thread_startup(&led_thread);
+//        rt_thread_startup(&db_test_thread);
 //    }
+//    
     
-
 #if (RT_THREAD_PRIORITY_MAX == 32)
     init_thread = rt_thread_create("init",
                                    rt_init_thread_entry, RT_NULL,
