@@ -97,8 +97,9 @@ static void tcp_client_thread(void *arg)
 {
   
   while(1) {
-    rt_thread_delay(5000);
+    rt_thread_delay(500);
     tcp_client();
+    rt_thread_delay(10000);
     
   }
 }
@@ -139,14 +140,14 @@ static void tcp_server_thread(void *arg)
   }
 }
 
-//extern void test_db(void);
-//static void db_test_thread(void *arg)
-//{
-//  while(1) {
-//    rt_thread_delay(500);
-//    test_db();
-//  }
-//}
+extern void test_db(void);
+static void db_test_thread(void *arg)
+{
+  while(1) {
+    rt_thread_delay(500);
+    test_db();
+  }
+}
 
 
 #ifdef RT_USING_RTGUI
@@ -261,6 +262,7 @@ void rt_init_thread_entry(void* parameter)
 
     #ifdef RT_USING_SQLITE
 //          sys_thread_new("db_test", db_test_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);
+          sys_thread_new("db_test", db_test_thread, NULL, 2048, TCPIP_THREAD_PRIO);
     #endif /* RT_USING_SQLITE */          
           
 #endif /*RT_USING_LWIP*/
@@ -308,7 +310,7 @@ int rt_application_init(void)
 #if (RT_THREAD_PRIORITY_MAX == 32)
     init_thread = rt_thread_create("init",
                                    rt_init_thread_entry, RT_NULL,
-                                   2048, 8, 20);
+                                   4096, 8, 20);
 #else
     init_thread = rt_thread_create("init",
                                    rt_init_thread_entry, RT_NULL,
