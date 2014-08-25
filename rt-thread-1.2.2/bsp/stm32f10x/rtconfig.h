@@ -15,15 +15,17 @@
 
 #define 	RT_USING_SPI 
 #define     ENC28J60
+//#define DM9000
 
 #define     TCP_CLIENT
 #define     UART_TO_TCP
 #define     UDP_SERVER
 #define     FILE_TEST
+#define     RT_USING_SQLITE
 
 
 /*******************************add by jason *******************************/
-//#define DM9000
+
 
 /* RT_NAME_MAX*/
 #define RT_NAME_MAX	8

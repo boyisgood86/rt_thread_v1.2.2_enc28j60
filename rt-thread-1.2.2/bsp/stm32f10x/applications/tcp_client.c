@@ -6,11 +6,11 @@
 
 #define LEN     (256)
 
-//#define TEST_IP     ("192.168.1.123")
-//#define TEST_PORT   (10000)
+#define TEST_IP     ("192.168.1.123")
+#define TEST_PORT   (10000)
 
-#define TEST_IP     ("192.168.1.199")
-#define TEST_PORT   (9988)
+//#define TEST_IP     ("192.168.1.199")
+//#define TEST_PORT   (9988)
 
 #define CLIENT_PORT     (10030)
 
@@ -30,7 +30,7 @@ enum VAL {
  FALSE_KEEPALIVE = -102,
 };
 
-unsigned char send_data[] = "Hello";
+unsigned char send_data[LEN];
 char recv_buff[LEN];
 
 int client_sock = -1;
@@ -155,15 +155,15 @@ int init_socket(void)
     return FALSE;
   }
   /*bind client*/
-  client_addr.sin_family = AF_INET;
-  client_addr.sin_port = htons(CLIENT_PORT);
-  client_addr.sin_addr.s_addr = INADDR_ANY;
-  rt_memset(&(client_addr.sin_zero), 0, sizeof(client_addr.sin_zero));  
-  if(lwip_bind(client_sock, (struct sockaddr *)&client_addr, sizeof(struct sockaddr)) < 0) {
-    MY_DEBUG("bind client faild\n\r");
-    lwip_close(client_sock);
-    return FALSE;
-   }  
+//  client_addr.sin_family = AF_INET;
+//  client_addr.sin_port = htons(CLIENT_PORT);
+//  client_addr.sin_addr.s_addr = INADDR_ANY;
+//  rt_memset(&(client_addr.sin_zero), 0, sizeof(client_addr.sin_zero));  
+//  if(lwip_bind(client_sock, (struct sockaddr *)&client_addr, sizeof(struct sockaddr)) < 0) {
+//    MY_DEBUG("bind client faild\n\r");
+//    lwip_close(client_sock);
+//    return FALSE;
+//   }  
  /*connect server*/
   server_addr.sin_family = AF_INET;
   server_addr.sin_port = htons(TEST_PORT);
@@ -180,12 +180,37 @@ int init_socket(void)
 }
 
 
+
+void do_heart_data(void)
+{
+    send_data[0] = 0x28;
+    send_data[1] = 'w';
+    send_data[2] = 'w';
+    send_data[3] = 'w';
+    send_data[4] = 'w';
+    send_data[5] = 'w';
+    send_data[6] = 'w';
+    send_data[7] = 'w';
+    send_data[8] = 'w';
+    send_data[9] = 0x11;
+    send_data[10] = 0x00;
+    send_data[11] = 'H';
+    send_data[12] = 'e';
+    send_data[13] = 'l';
+    send_data[14] = 'l';
+    send_data[15] = 'o';
+    send_data[16] = 0x28;
+}
+
+
 /*Hearbet function*/
 int client_hearbet(void)
 {
   int retval = -1, maxfdp = -1, heart_count = 0;
   int recv_bytes = -1;
+  int i = 0;
   char heart_buff[LEN];
+  
   struct timeval timeout;
   fd_set readset;
   //TODO...
@@ -199,6 +224,13 @@ int client_hearbet(void)
   maxfdp = client_sock + 1;
   FD_ZERO(&readset);
   FD_SET(client_sock, &readset);
+  do_heart_data();
+  MY_DEBUG("%s, %d: hear data is \n\r",__func__,__LINE__);
+  for (i = 0; i < 16; i++) {
+    MY_DEBUG("%02X ",send_data[i]);
+  }
+  MY_DEBUG("\n\r");
+  
   while(1) {
       if( send(client_sock, send_data, sizeof(send_data), 0) < 0) {
           MY_DEBUG("send data to server faild !\n\r");
@@ -237,7 +269,7 @@ int client_hearbet(void)
               return FALSE;              
             }else {
               if(strncmp("Hello", heart_buff, 6) == 0) {
-                MY_DEBUG("%s, %d: recv data from server : %s\n\r",__func__,__LINE__,heart_buff);
+                MY_DEBUG("%s, %d: recv data from server :%s\n\r",__func__,__LINE__,heart_buff);
                 FD_CLR(client_sock,&readset);
                 return TRUE;
               }
@@ -254,12 +286,37 @@ int client_hearbet(void)
   }
 }
 
-
+char back_to_server[LEN];
+int do_send_data(char s[], int recv_bytes)
+{
+  int i = 0;
+  if(!s || recv_bytes < 0) {
+    MY_DEBUG("%s, %d: data error\n\r",__func__,__LINE__);
+    return -1;
+  }
+  rt_memset(back_to_server, 0, sizeof(back_to_server));
+    back_to_server[0] = 0x7C;
+    for(i = 1; i <9; i++) {
+        back_to_server[i] = s[i];
+    }
+    i = 8;
+    back_to_server[9] = 0x11;
+    back_to_server[10] = 0x01;
+    for(i = 11; i < recv_bytes; i++) {
+        back_to_server[i] = s[i];
+    }
+    MY_DEBUG("%s,%d: \n\n\r",__func__,__LINE__);
+    for(i = 0; i < recv_bytes; i++) {
+        MY_DEBUG("%02X ",back_to_server[i]);
+    }
+    MY_DEBUG("\n%s,%d: \n\n\r",__func__,__LINE__);
+    return 0;
+}
 
 void tcp_client(void)
 {
   
-  int retval = -1, maxfdp = -1, timeout_count = 0, err = -1;
+  int retval = -1, maxfdp = -1, timeout_count = 0, err = -1,i = 0;
   int recv_bytes = -1;
   char client_buff[LEN];
   char err_back[] = "Hi, data string error!";
@@ -326,12 +383,24 @@ void tcp_client(void)
             return ;
         }else {
             MY_DEBUG("%s, %d: recv server data is : %s \n\r",__func__,__LINE__,client_buff);
+            //do send data
+            MY_DEBUG("\n\n\r");
+            for(i = 0; i < recv_bytes; i++) {
+                MY_DEBUG("%02X ", client_buff[i]);
+            }
+            
+            MY_DEBUG("\n\r");
+            
+            if(do_send_data(client_buff, recv_bytes) < 0) {
+              MY_DEBUG("%s, %d: do_send_data faild!\n\r",__func__,__LINE__);
+              return ;
+            }
             rt_mutex_take(&socket_mutex,RT_WAITING_FOREVER);
-            if(send(client_sock, client_buff, LEN, 0) < 0) {
+            if(send(client_sock, back_to_server, recv_bytes, 0) < 0) {
                lwip_close(client_sock);
                client_sock = -1;
-                rt_mutex_release(&socket_mutex);
-                return ;
+               rt_mutex_release(&socket_mutex);
+               return ;
             }
             rt_mutex_release(&socket_mutex);
         }

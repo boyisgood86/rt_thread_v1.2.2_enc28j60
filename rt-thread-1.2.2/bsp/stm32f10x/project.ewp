@@ -324,6 +324,7 @@
           <state>$PROJ_DIR$\..\..\components\init</state>
           <state>$PROJ_DIR$\..\..\components\finsh</state>
           <state>$PROJ_DIR$\Libraries\CMSIS\CM3\DeviceSupport\ST\STM32F10x</state>
+          <state>$PROJ_DIR$\..\..\components\external\SQLite-3.8.1\SQLiteLib\</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1936,6 +1937,9 @@
       <name>$PROJ_DIR$\applications\filesystem.c</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\applications\sqlite_test.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\applications\startup.c</name>
     </file>
     <file>
@@ -2237,6 +2241,12 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\components\net\lwip-1.4.1\src\core\udp.c</name>
+    </file>
+  </group>
+  <group>
+    <name>Sqlite3.8</name>
+    <file>
+      <name>$PROJ_DIR$\..\..\components\external\SQLite-3.8.1\SQLiteLib\sqlite3.c</name>
     </file>
   </group>
   <group>
