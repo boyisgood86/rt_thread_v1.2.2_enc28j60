@@ -12,7 +12,11 @@
           
           
           
+<<<<<<< HEAD
         <Column0>182</Column0><Column1>27</Column1><Column2>27</Column2><Column3>27</Column3></ColumnWidths>
+=======
+        <Column0>162</Column0><Column1>27</Column1><Column2>27</Column2><Column3>27</Column3></ColumnWidths>
+>>>>>>> origin/master
       </Workspace>
       <Build>
         
@@ -25,7 +29,11 @@
     <Windows>
       
       
+<<<<<<< HEAD
     <Wnd0>
+=======
+    <Wnd2>
+>>>>>>> origin/master
         <Tabs>
           <Tab>
             <Identity>TabID-25582-10308</Identity>
@@ -33,29 +41,49 @@
             <Factory>Workspace</Factory>
             <Session>
               
+<<<<<<< HEAD
             <NodeDict><ExpandedNode>project</ExpandedNode><ExpandedNode>project/Applications</ExpandedNode><ExpandedNode>project/Components</ExpandedNode></NodeDict></Session>
+=======
+            <NodeDict><ExpandedNode>project</ExpandedNode><ExpandedNode>project/Filesystem</ExpandedNode><ExpandedNode>project/Sqlite3.8</ExpandedNode></NodeDict></Session>
+>>>>>>> origin/master
           </Tab>
         <Tab><Identity>TabID-28994-24410</Identity><TabName>Source Browser</TabName><Factory>SourceBrowser</Factory><Session><TypeFilter>2147483647</TypeFilter><FileFilter>1</FileFilter></Session></Tab></Tabs>
         
+<<<<<<< HEAD
       <SelectedTab>0</SelectedTab></Wnd0><Wnd2>
+=======
+      <SelectedTab>0</SelectedTab></Wnd2><Wnd3>
+>>>>>>> origin/master
         <Tabs>
           
-        <Tab><Identity>TabID-12975-10057</Identity><TabName>Declarations</TabName><Factory>Find-All-Declarations</Factory><Session/></Tab><Tab><Identity>TabID-11947-24483</Identity><TabName>Build</TabName><Factory>Build</Factory><Session/></Tab></Tabs>
+        <Tab><Identity>TabID-12975-10057</Identity><TabName>Declarations</TabName><Factory>Find-All-Declarations</Factory><Session/></Tab><Tab><Identity>TabID-11947-24483</Identity><TabName>Build</TabName><Factory>Build</Factory><Session/></Tab><Tab><Identity>TabID-597-20174</Identity><TabName>Find in Files</TabName><Factory>Find-in-Files</Factory><Session/></Tab><Tab><Identity>TabID-21415-27044</Identity><TabName>Debug Log</TabName><Factory>Debug-Log</Factory><Session/></Tab></Tabs>
         
+<<<<<<< HEAD
       <SelectedTab>1</SelectedTab></Wnd2></Windows>
+=======
+      <SelectedTab>2</SelectedTab></Wnd3></Windows>
+>>>>>>> origin/master
     <Editor>
       
       
       
       
+<<<<<<< HEAD
     <Pane><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\applications\application.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>255</YPos2><SelStart2>7119</SelStart2><SelEnd2>7119</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\rtconfig.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>131</YPos2><SelStart2>3688</SelStart2><SelEnd2>3692</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\applications\tcp_client.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>0</YPos2><SelStart2>266</SelStart2><SelEnd2>266</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\applications\udp_server.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>91</YPos2><SelStart2>1372</SelStart2><SelEnd2>1372</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\applications\tcp_server.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>18</YPos2><SelStart2>374</SelStart2><SelEnd2>374</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\applications\startup.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>81</YPos2><SelStart2>2446</SelStart2><SelEnd2>2446</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\drivers\dm9000a.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>778</YPos2><SelStart2>1181</SelStart2><SelEnd2>1181</SelEnd2></Tab><ActiveTab>6</ActiveTab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\drivers\enc28j60.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>782</YPos2><SelStart2>22990</SelStart2><SelEnd2>22990</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\..\src\clock.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>42</YPos2><SelStart2>1917</SelStart2><SelEnd2>1917</SelEnd2></Tab></Pane><ActivePane>0</ActivePane><Pane/><Sizes><Pane><X>924423</X><Y>1000000</Y></Pane><Pane><X>75576</X><Y>1000000</Y></Pane></Sizes><SplitMode>4</SplitMode></Editor>
+=======
+    <Pane><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\applications\application.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>136</YPos2><SelStart2>3227</SelStart2><SelEnd2>3227</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\applications\sqlite_test.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>23</YPos2><SelStart2>1351</SelStart2><SelEnd2>1351</SelEnd2></Tab><ActiveTab>1</ActiveTab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\applications\startup.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>81</YPos2><SelStart2>2531</SelStart2><SelEnd2>2531</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\applications\tcp_client.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>308</YPos2><SelStart2>8794</SelStart2><SelEnd2>8794</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\..\components\external\SQLite-3.8.1\SQLiteLib\sqlite3.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>83476</YPos2><SelStart2>3002484</SelStart2><SelEnd2>3002484</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\..\components\dfs\src\dfs_posix.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>754</YPos2><SelStart2>15022</SelStart2><SelEnd2>15022</SelEnd2></Tab></Pane><ActivePane>0</ActivePane><Pane/><Sizes><Pane><X>927977</X><Y>1000000</Y></Pane><Pane><X>72022</X><Y>1000000</Y></Pane></Sizes><SplitMode>4</SplitMode></Editor>
+>>>>>>> origin/master
     <Positions>
       
       
       
       
       
+<<<<<<< HEAD
     <Top><Row0><Sizes><Toolbar-00D45C60><key>iaridepm.enu1</key></Toolbar-00D45C60></Sizes></Row0></Top><Left><Row0><Sizes><Wnd0><Rect><Top>-2</Top><Left>-2</Left><Bottom>428</Bottom><Right>273</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>167</yscreen><sizeHorzCX>271739</sizeHorzCX><sizeHorzCY>246677</sizeHorzCY><sizeVertCX>373641</sizeVertCX><sizeVertCY>635155</sizeVertCY></Rect></Wnd0></Sizes></Row0></Left><Right><Row0><Sizes/></Row0></Right><Bottom><Row0><Sizes><Wnd2><Rect><Top>-2</Top><Left>-2</Left><Bottom>204</Bottom><Right>738</Right><x>-2</x><y>-2</y><xscreen>740</xscreen><yscreen>206</yscreen><sizeHorzCX>1005435</sizeHorzCX><sizeHorzCY>304284</sizeHorzCY><sizeVertCX>271739</sizeVertCX><sizeVertCY>246677</sizeVertCY></Rect></Wnd2></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
+=======
+    <Top><Row0><Sizes><Toolbar-01CFF140><key>iaridepm.enu1</key></Toolbar-01CFF140></Sizes></Row0><Row1><Sizes/></Row1></Top><Left><Row0><Sizes><Wnd2><Rect><Top>-2</Top><Left>-2</Left><Bottom>470</Bottom><Right>236</Right><x>-2</x><y>-2</y><xscreen>200</xscreen><yscreen>167</yscreen><sizeHorzCX>147059</sizeHorzCX><sizeHorzCY>243440</sizeHorzCY><sizeVertCX>175000</sizeVertCX><sizeVertCY>688047</sizeVertCY></Rect></Wnd2></Sizes></Row0></Left><Right><Row0><Sizes/></Row0></Right><Bottom><Row0><Sizes><Wnd3><Rect><Top>-2</Top><Left>-2</Left><Bottom>171</Bottom><Right>1362</Right><x>-2</x><y>-2</y><xscreen>1364</xscreen><yscreen>173</yscreen><sizeHorzCX>1002941</sizeHorzCX><sizeHorzCY>252187</sizeHorzCY><sizeVertCX>147059</sizeVertCX><sizeVertCY>243440</sizeVertCY></Rect></Wnd3></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
+>>>>>>> origin/master
   </Desktop>
 </Workspace>
 

@@ -179,6 +179,9 @@
       <name>$PROJ_DIR$\applications\filesystem.c</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\applications\sqlite_test.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\applications\startup.c</name>
     </file>
     <file>
@@ -480,6 +483,12 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\components\net\lwip-1.4.1\src\core\udp.c</name>
+    </file>
+  </group>
+  <group>
+    <name>Sqlite3.8</name>
+    <file>
+      <name>$PROJ_DIR$\..\..\components\external\SQLite-3.8.1\SQLiteLib\sqlite3.c</name>
     </file>
   </group>
   <group>
