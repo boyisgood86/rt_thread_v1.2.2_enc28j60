@@ -1,6 +1,8 @@
 rt_thread_v1.2.2_enc28j60
 
 @author： jason.shi
+
+
 @Emali: newleaves@126.com
 
 =========================
@@ -97,8 +99,13 @@ http://sourceforge.net/projects/cjson/
 -------------------
 
 在cjson.c中修改的地方为： 将malloc 替换成 rt_malloc   将free 替换成 rt_free.  将 cJSON.c 文件中的 size_t 修改为 rt_size_t，并相应的调整了 cJSON.h文件中相对应的地方
-bug:  尚未严格测试，尚不明白。
+
+
+bug:  未严格测试，尚不明白。
+
+
 具体使用方法，可以参考：
 http://blog.csdn.net/xukai871105/article/details/17094113
+
 -------------------
 
