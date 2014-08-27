@@ -13,9 +13,9 @@ char *file_name = "/test.txt";
 
 void file_op(void)
 {
-    char *out;
+ //   char *out;
     char text[] = "{\"timestamp\":\"2013-11-19T08:50:11\",\"value\":1}";
-    cJSON *json;
+    cJSON *json, *json_value, *json_timestamp ;
     
     MY_DEBUG("%s:%d: <------------>\n\r",__func__,__LINE__);
     list_mem();
@@ -23,11 +23,20 @@ void file_op(void)
     if(!json) {
       MY_DEBUG("%s:%d:  Error before: [%s]\n\r",__func__,__LINE__,cJSON_GetErrorPtr());
     }else {
-        out=cJSON_Print(json);
-        list_mem();
+//        out=cJSON_Print(json);
+        
+        json_timestamp = cJSON_GetObjectItem( json , "timestamp");
+        if( json_timestamp->type == cJSON_String ) {
+          MY_DEBUG("%s, %d: timestamp is %s\n\r",__func__,__LINE__,json_timestamp->valuestring);
+        }
+        
+        json_value = cJSON_GetObjectItem(json, "value");
+        if(json_value->type == cJSON_Number) {
+          MY_DEBUG("%s, %d: value is %d\n\r",__func__,__LINE__, json_value->valueint);
+        }
         cJSON_Delete(json);
-        MY_DEBUG("%s\n",out);
-        free(out);
+ //       MY_DEBUG("%s\n",out);
+//        free(out);
     }
     MY_DEBUG("%s:%d <<----------------->>\n\r",__func__,__LINE__);
     return ;
