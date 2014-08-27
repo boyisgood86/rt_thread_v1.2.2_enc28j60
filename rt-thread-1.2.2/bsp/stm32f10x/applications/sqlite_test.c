@@ -23,28 +23,29 @@ static int callback(void *NotUsed, int argc, char **argv, char **azColName){
 void test_db(void)
 {
     sqlite3 *db;
-    int ret = -1;
-    char *zErrMsg = 0;
+    int result = -1;
+    char *errmsg = NULL;
     
 
-    ret = sqlite3_open(db_name, &db);
-    MY_DEBUG("%s, %d:  ret = %d\n\r",__func__,__LINE__,ret);
-    if(ret != SQLITE_OK) {
+    result = sqlite3_open(db_name, &db);
+    MY_DEBUG("%s, %d:  ret = %d\n\r",__func__,__LINE__,result);
+    if(result != SQLITE_OK) {
       MY_DEBUG("%s, %d: open db file %s faild : %s ...\n\r",__func__,__LINE__, db_name,sqlite3_errmsg(db));
       return ;
     }else {
       MY_DEBUG("%s, %d: open db file %s success ...\n\r",__func__,__LINE__, db_name);
     }
-    ret = sqlite3_exec(db, sql, callback, 0, &zErrMsg);
-    if(ret != SQLITE_OK) {
-      MY_DEBUG("%s, %d: exec error: %s..\n\r",__func__,__LINE__,sqlite3_errmsg(db));
-      sqlite3_free(zErrMsg);
-      sqlite3_close(db);
+
+    result = sqlite3_exec(db, "create table tb(ID integer primary key autoincrement, name nvarchar(32))", NULL, NULL, NULL);
+    if(result != SQLITE_OK) {
+      MY_DEBUG("%s, %d: create table faild: %d, %s\n\r",__func__,__LINE__, result,sqlite3_errmsg(db));
+      MY_DEBUG("flow memory use : \n\r");
+      list_mem();
+      sqlite3_close( db );
       return ;
     }else {
-      MY_DEBUG("%s, %d: exec success..\n\r",__func__,__LINE__);
+      MY_DEBUG("%s, %d: create success !\n\r",__func__,__LINE__);
     }
-     sqlite3_free(zErrMsg);
-    sqlite3_close(db);
+    sqlite3_close( db );
     return ;
 }

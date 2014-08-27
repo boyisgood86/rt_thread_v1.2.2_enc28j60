@@ -34,7 +34,7 @@
 
 // <o> Internal SRAM memory size[Kbytes] <8-64>
 //	<i>Default: 64
-#define STM32_SRAM_SIZE         64
+#define STM32_SRAM_SIZE         62
 #define STM32_SRAM_END          (0x20000000 + STM32_SRAM_SIZE * 1024)
 
 /* USART driver select. */

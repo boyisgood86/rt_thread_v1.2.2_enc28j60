@@ -179,6 +179,9 @@
       <name>$PROJ_DIR$\applications\filesystem.c</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\applications\json_test.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\applications\sqlite_test.c</name>
     </file>
     <file>
@@ -336,6 +339,12 @@
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\components\finsh\symbol.c</name>
+    </file>
+  </group>
+  <group>
+    <name>JsonLib</name>
+    <file>
+      <name>$PROJ_DIR$\..\..\components\json\cJSON.c</name>
     </file>
   </group>
   <group>

@@ -33,7 +33,7 @@ Stop=1
 Freq=10000000
 MultiCoreRunAll=1
 [DebugChecksum]
-Checksum=-675282724
+Checksum=-155957768
 [Exceptions]
 StopOnUncaught=_ 0
 StopOnThrow=_ 0
@@ -62,7 +62,7 @@ Exclusions=
 mode=0
 [Breakpoints2]
 Bp0=_ 0 "EMUL_CODE" "{$PROJ_DIR$\drivers\spi.c}.7.1" 0 0 1 "" 0 "" 0
-Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\applications\filesystem.c}.40.9" 0 0 1 "" 0 "" 0
+Bp1=_ 0 "EMUL_CODE" "{$PROJ_DIR$\applications\filesystem.c}.62.7" 0 0 1 "" 0 "" 0
 Count=2
 [Aliases]
 Count=0

@@ -117,7 +117,7 @@ extern void file_op(void);
 static void file_test_thread(void *arg)
 {
   while(1) {
-    rt_thread_delay(3000);
+    rt_thread_delay(300);
     file_op();
   }
 }
@@ -143,10 +143,10 @@ static void tcp_server_thread(void *arg)
 extern void test_db(void);
 static void db_test_thread(void *arg)
 {
-  while(1) {
-    rt_thread_delay(500);
+//  while(1) {
+    rt_thread_delay(3000);
     test_db();
-  }
+//  }
 }
 
 
@@ -241,19 +241,19 @@ void rt_init_thread_entry(void* parameter)
 	#endif /*ENC28J60*/
         
     #ifdef  TCP_CLIENT
-          sys_thread_new("tcp_client", tcp_client_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);
+//          sys_thread_new("tcp_client", tcp_client_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);
     #endif   /*TCP_CLIENT*/
           
     #ifdef UDP_SERVER
-          sys_thread_new("udp_server", udp_server_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);    
+//          sys_thread_new("udp_server", udp_server_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);    
     #endif /* UDP_SERVER */
           
 #ifdef TCP_SERVER
-          sys_thread_new("tcp_server", tcp_server_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);
+//          sys_thread_new("tcp_server", tcp_server_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);
 #endif /* TCP_SERVER */
           
     #ifdef UART_TO_TCP
-          sys_thread_new("tcp_uart", uart_tcp_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);    
+//          sys_thread_new("tcp_uart", uart_tcp_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);    
     #endif /*UART_TO_TCP*/
           
     #ifdef FILE_TEST
@@ -262,7 +262,7 @@ void rt_init_thread_entry(void* parameter)
 
     #ifdef RT_USING_SQLITE
 //          sys_thread_new("db_test", db_test_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);
-          sys_thread_new("db_test", db_test_thread, NULL, 2048, TCPIP_THREAD_PRIO);
+//          sys_thread_new("db_test", db_test_thread, NULL, 2048, TCPIP_THREAD_PRIO);
     #endif /* RT_USING_SQLITE */          
           
 #endif /*RT_USING_LWIP*/

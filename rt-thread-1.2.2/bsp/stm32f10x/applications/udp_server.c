@@ -46,8 +46,8 @@ void udp_server(void)
 //    MY_DEBUG("%s, %d: my host ip is : %s\n\r",__func__,__LINE__, inet_ntoa( server_addr.sin_addr.s_addr));
 //    MY_DEBUG("%s, %d: my host port is : %d\n\r",__func__,__LINE__, (int) ntohs(server_addr.sin_port));
 //  }
-  
-    list_if();
+//  
+//    list_if();
   /*setsockopt*/
   err = setsockopt(udp_sock, SOL_SOCKET, 
                    SO_REUSEADDR, 
