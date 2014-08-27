@@ -1,4 +1,8 @@
 rt_thread_v1.2.2_enc28j60
+
+@author： jason.shi
+@Emali: newleaves@126.com
+
 =========================
 最新的稳定版本  rt_thread v1.2.2 <2014-08-01 14:16发布>
 
@@ -56,3 +60,45 @@ C   #define  TCP_KEEPCNT_DEFAULT      3U      /*9次 --> 3次*/
 3  挂载文件系统 ELMFAT 成功 dfs_init() elm_init() mount...
 
 4  文件读写测试通过   在rtconfig.h 文件中打开 FILE_TEST 宏即可测试。在 init 主线程中测试。
+
+
+2014-08-25 增加内容：
+
+将sqlite-3.8加入了编译，并准备测试。
+测试结果： 能创建数据库，但是无法操作sql语句，因为操作sql语句的时候，需要较大ram空间。而我板子上的内存空间仅仅64KB，不够用，于是无法测试。
+听rtt groups.google.com 上的朋友建议，如果要使用sqlite，ram空间的硬性指标应该在 100K+，而按照测试来看，不跑数据库，在使用lwip +ELMFAT的时候，内存消耗应该在30-40KB之间
+这个数值可能因每个人的程序不同而不同，具体的，可以在程序中调用  list_mem() API  ，然后通过串口打印观察。
+
+
+2014-08-27 增加内容如下：
+
+将 网络开源的cjson库移植到rtt上，并使用如下程序进行测试：
+
+http://sourceforge.net/projects/cjson/ 
+------------------
+    char *out;
+    char text[] = "{\"timestamp\":\"2013-11-19T08:50:11\",\"value\":1}";
+    cJSON *json;
+    
+    MY_DEBUG("%s:%d: <------------>\n\r",__func__,__LINE__);
+    list_mem();
+    json=cJSON_Parse(text);
+    if(!json) {
+      MY_DEBUG("%s:%d:  Error before: [%s]\n\r",__func__,__LINE__,cJSON_GetErrorPtr());
+    }else {
+        out=cJSON_Print(json);
+        list_mem();
+        cJSON_Delete(json);
+        MY_DEBUG("%s\n",out);
+        free(out);
+    }
+    MY_DEBUG("%s:%d <<----------------->>\n\r",__func__,__LINE__);
+	
+-------------------
+
+在cjson.c中修改的地方为： 将malloc 替换成 rt_malloc   将free 替换成 rt_free.  将 cJSON.c 文件中的 size_t 修改为 rt_size_t，并相应的调整了 cJSON.h文件中相对应的地方
+bug:  尚未严格测试，尚不明白。
+具体使用方法，可以参考：
+http://blog.csdn.net/xukai871105/article/details/17094113
+-------------------
+
