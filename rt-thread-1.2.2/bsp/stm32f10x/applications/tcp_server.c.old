@@ -1,0 +1,628 @@
+#include <rtthread.h>
+#include <lwip/netdb.h> 
+#include <lwip/sockets.h>
+#include "cJSON.h"
+#include "ym_config.h"
+#include "login.h"
+#include "white_list.h"
+
+
+#define LEN     (256)
+#define BACKLOG     (10)
+
+enum {
+  disable = 0,
+  enable = 1,  
+  buff_size = 1024,
+};
+
+extern rt_uint8_t white_list_enable;
+/* json string to struct data */
+static JSON js_to_struct(const char * const string)
+{
+    const char *s = string;
+    JSON cjson;
+    cJSON * js_root, *js_body, *js_head, *js_user, *js_other,*js;
+          
+    //for test
+    MY_DEBUG("%s,%d: tcp string is %s\n\r",__func__,__LINE__,string);
+    
+    if(!string) { MY_DEBUG("%s,%d: json string is NULL\n\r",__func__,__LINE__); goto EXIT; }
+    rt_memset(&cjson, 0, sizeof(cjson));
+    
+    /* create json root */
+    js_root = cJSON_Parse(string);
+    if(!js_root) { MY_DEBUG("%s,%d: get js root faild !\n\r",__func__,__LINE__); cJSON_GetErrorPtr(); goto EXIT; }
+       
+    /*  parsel body */
+    js_body = cJSON_GetObjectItem(js_root, "body") ;
+    if(!js_body) { MY_DEBUG("%s,%d: no body !\n\r",__func__,__LINE__); goto EXIT;}
+    js_user = cJSON_GetObjectItem(js_body, "user");
+    if(!js_user) { MY_DEBUG("%s,%d: no user !\n\r",__func__,__LINE__); goto EXIT;}
+    
+    /* fix cjson struct */
+    js = cJSON_GetObjectItem(js_user, "name");
+    if(!js) { MY_DEBUG("%s,%d: no name..!\n\r",__func__,__LINE__); goto EXIT; }
+    if(js->type == cJSON_String) strcpy(cjson.name , js->valuestring);
+    
+    js = cJSON_GetObjectItem(js_user, "password");
+    if(!js) { MY_DEBUG("%s,%d: no passwd\n\r",__func__,__LINE__); goto EXIT;}
+    if(js->type == cJSON_String) strcpy(cjson.passwd, js->valuestring);
+    
+    /* parsel head */
+    js_head = cJSON_GetObjectItem(js_root, "head") ;
+    if(!js_head) { MY_DEBUG("%s,%d: no head..\n\r",__func__,__LINE__); goto EXIT; };
+    /* fix cjson struct */
+    js = cJSON_GetObjectItem(js_head, "method");
+    if(!js) { MY_DEBUG("%s,%d: no method\n\r",__func__,__LINE__); goto EXIT; }
+    if(js->type == cJSON_Number)  cjson.method = js->valueint;
+    
+    js = cJSON_GetObjectItem(js_head, "mobileid");
+    if(!js) { MY_DEBUG("%s,%d: no mobileid\n\r",__func__,__LINE__); goto EXIT; }
+    if(js->type == cJSON_String)  strcpy(cjson.mobileid , js->valuestring);
+    
+    js = cJSON_GetObjectItem(js_head, "status");
+    if(!js) { MY_DEBUG("%s,%d: no status\n\r",__func__,__LINE__); goto EXIT; }
+    if(js->type == cJSON_Number)  cjson.status = js->valueint;    
+    
+    /* enable or disable whitelist */
+    if(cjson.method == off_whitelist) {
+        js_other = cJSON_GetObjectItem(js_body, "other");
+        if( !js_other) { MY_DEBUG("%s,%d: no isAuthority\n\r",__func__,__LINE__);}
+        else {
+            js = cJSON_GetObjectItem(js_other, "isAuthority");
+            if(!js) { MY_DEBUG("%s,%d: isAuthority error..\n\r",__func__,__LINE__);}
+            else{
+              if(js->type == cJSON_Number) {
+                /* disable whitelist */
+                if (js->valueint == disable) disable_white_list();
+                /* enable whitelist */
+                if (js->valueint == enable) enable_white_list();
+              }
+            }
+        }
+    }
+    
+    /*delet js_root*/
+    cJSON_Delete(js_root);
+    /* set cjson flag */
+    cjson.flag = 1;
+    
+    return cjson;
+EXIT:
+  if(js_root)   cJSON_Delete(js_root);
+  cjson.flag = 0;
+  return cjson;
+}
+
+/* do login error msg */
+static int do_error_msg(char * const out)
+{
+  cJSON *root, *js_head;
+  const char * const head = "head";
+  const char * const status = "status";
+  const char * const message = "message";
+  // {"head":{"message":ERR_MSG,"status":0}}
+  
+  if(!out) { MY_DEBUG("%s,%d: out is NULL...\n\r",__func__,__LINE__); goto EXIT; }
+    
+  /* create json string root */
+  root = cJSON_CreateObject();
+  if(!root) { MY_DEBUG("%s,%d:  get root is faild !\n\r",__func__,__LINE__); cJSON_GetErrorPtr(); goto EXIT; }
+  
+  cJSON_AddItemToObject(root,head,js_head=cJSON_CreateObject());
+  cJSON_AddNumberToObject(js_head,status,0);
+  cJSON_AddStringToObject(js_head,message,"登陆失败");
+  
+  {
+    char *s = cJSON_PrintUnformatted(root);
+    if(!s) { MY_DEBUG("%s,%d: js print to string faild!\n\r",__func__,__LINE__); goto EXIT; }
+    rt_memset(out, 0, buff_size);
+    strcpy(out, s);
+    rt_free(s);
+  }
+  
+  /* delet root node */
+  cJSON_Delete(root);
+  
+  /**/
+  MY_DEBUG("%s,%d: out string is %s\n\r",__func__,__LINE__,out);
+  return ym_ok;
+EXIT:
+    if(root)    cJSON_Delete(root);
+    return ym_err;
+}
+
+/* Normal user login msg packing */
+static int do_normal_msg(char* const out)
+{
+//TODO...
+  cJSON *root, *js_head;
+  const char * const head = "head";
+  const char * const status = "status";
+  const char * const message = "message";
+
+  if(!out) { MY_DEBUG("%s,%d: out is NULL...\n\r",__func__,__LINE__); goto EXIT; }
+    /* create json string root */
+  root = cJSON_CreateObject();
+  if(!root) { MY_DEBUG("%s,%d: get js root faild !\n\r",__func__,__LINE__); goto EXIT; }
+  cJSON_AddItemToObject(root,head,js_head=cJSON_CreateObject());
+  cJSON_AddNumberToObject(js_head,status,1);
+  cJSON_AddStringToObject(js_head,message,"登陆成功");
+  
+  {
+    char *s = cJSON_PrintUnformatted(root);
+    if(!s) { MY_DEBUG("%s,%d: js print to string faild!\n\r",__func__,__LINE__); goto EXIT; }
+    rt_memset(out, 0, buff_size);
+    strcpy(out, s);
+    rt_free(s);
+  }
+  
+  /* delet root node */
+  cJSON_Delete(root);  
+  return ym_ok;
+  
+EXIT:
+  if(root) cJSON_Delete(root);
+  return ym_err;
+}
+
+
+/* pack json string for return to ask [eg. admin]*/
+static int do_admin_msg(char * const out, white_list_t * whitelist, char count, JSON *js)
+{
+    cJSON *root, *js_body, *js_list,*js_other, *js_user,*js_head;
+    char i = 0;
+    const char * const head = "head";
+    const char * const body = "body";
+    const char * const list = "list";
+    const char * const other = "other";
+    const char * const user = "user";    
+    if(!out) {
+      MY_DEBUG("%s,%d: out is NULL!\n\r",__func__,__LINE__);
+      goto EXIT;
+    }
+    /* create json string root */
+    root = cJSON_CreateObject();
+    if(!root) { MY_DEBUG("%s,%d: get root faild\n\r",__func__,__LINE__); goto EXIT; }
+    
+    /* packing a json string now... */     
+
+//{"body":{"list":["admin","admin11","admin22"],"other":{"isAuthority":true},"user":{"name":"admin","password":"admin"}},"head":{"method":1000,"mobileid":"353714986786243","status":0}}        
+        
+        /* body */
+      cJSON_AddItemToObject(root, body, js_body = cJSON_CreateObject());
+        /*list*/
+      if(whitelist != RT_NULL) {
+        cJSON_AddItemToObject(js_body, list, js_list = cJSON_CreateArray());
+        for(i = 0; i < count; i++) cJSON_AddItemToArray(js_list, cJSON_CreateString( (whitelist+i)->name) );
+      }       
+       /* other */
+       cJSON_AddItemToObject(js_body, other, js_other = cJSON_CreateObject());
+//       cJSON_AddNumberToObject(js_other,"isAuthority",white_list_enable);
+       cJSON_AddNumberToObject(js_other,"isAuthority",1);
+       
+       /* user */
+       cJSON_AddItemToObject(js_body, user, js_user = cJSON_CreateObject());
+       cJSON_AddStringToObject(js_user,"name",js->name);
+       cJSON_AddStringToObject(js_user,"password",js->passwd);
+       
+       /* head */
+       cJSON_AddItemToObject(root, head, js_head = cJSON_CreateObject());
+       cJSON_AddStringToObject(js_head,"message","登陆成功");
+       cJSON_AddNumberToObject(js_head,"method",js->method);
+       cJSON_AddStringToObject(js_head,"mobileid",js->mobileid);
+       cJSON_AddNumberToObject(js_head,"status",1);
+       cJSON_AddStringToObject(js_head,"boxid","827312897");
+       
+       {
+            char *s = cJSON_PrintUnformatted(root);
+            if(s) {
+                strcpy(out, s);
+                rt_free(s);
+            }
+       }
+       MY_DEBUG("%s,%d: do admin data string is :\n%s\n\r",__func__,__LINE__, out);
+       cJSON_Delete(root);
+       return ym_ok;
+EXIT:
+  if(root)    cJSON_Delete(root);
+  return ym_err;
+}
+
+/* add user msg packing */
+static int do_sign_msg(char *const out, int value, JSON * js)
+{
+//TODO..
+  cJSON *root, *js_body, *js_list,*js_other, *js_user,*js_head;
+  white_list_t * whitelist= RT_NULL;
+  char count = 0;
+  char i = 0;
+  
+  const char * const head = "head";
+  const char * const body = "body";
+  const char * const list = "list";
+  const char * const other = "other";
+  const char * const user = "user"; 
+  const char * const status = "status";
+  const char * const message = "message";
+  
+  /* Exception */
+  const char * const faild = "注册失败";
+  /* user exting */
+  const char * const existed = "用户已存在";
+  /* add success */
+  const char * const add_success = "注册成功";
+  if(!out) { MY_DEBUG("%s,%d: out is NULL...\n\r",__func__,__LINE__); goto EXIT; }
+  
+  /* get whitelist */
+  is_enable_list();
+  if(white_list_enable == ENABLE) white_list((void*)&whitelist, &count);
+  
+  /* create json string root */
+  root = cJSON_CreateObject();
+  if(!root) { MY_DEBUG("%s,%d:  get root is faild !\n\r",__func__,__LINE__); cJSON_GetErrorPtr(); goto EXIT; }
+  /* body */
+  cJSON_AddItemToObject(root,body,js_body=cJSON_CreateObject());
+  /*Array list*/
+  if(whitelist != RT_NULL) {
+    cJSON_AddItemToObject(js_body, list, js_list = cJSON_CreateArray());
+    for(i = 0; i < count; i++) cJSON_AddItemToArray(js_list, cJSON_CreateString( (whitelist+i)->name) );
+  }  
+  /* other */
+   cJSON_AddItemToObject(js_body, other, js_other = cJSON_CreateObject());
+   cJSON_AddNumberToObject(js_other,"isAuthority",white_list_enable);    
+  /* user */
+   cJSON_AddItemToObject(js_body, user, js_user = cJSON_CreateObject());
+   cJSON_AddStringToObject(js_user,"name",js->name);
+   cJSON_AddStringToObject(js_user,"password",js->passwd);  
+  
+   /* head */
+   cJSON_AddItemToObject(root, head, js_head = cJSON_CreateObject());
+   
+   switch(value) {
+       case FAIL:       cJSON_AddStringToObject(js_head,"message",faild); break ;
+       case SUCCESS:    cJSON_AddStringToObject(js_head,"message",add_success); break ; 
+       case EXIST:      cJSON_AddStringToObject(js_head,"message",existed); break ;
+       default: goto EXIT;
+   };
+   cJSON_AddNumberToObject(js_head,"method",js->method);
+   cJSON_AddStringToObject(js_head,"mobileid",js->mobileid);
+   cJSON_AddNumberToObject(js_head,"status",js->status);
+   cJSON_AddStringToObject(js_head,"boxid","827312897"); 
+  
+  {
+    char *s = cJSON_PrintUnformatted(root);
+    if(!s) { MY_DEBUG("%s,%d: js print to string faild!\n\r",__func__,__LINE__); goto EXIT; }
+    rt_memset(out, 0, buff_size);
+    strcpy(out, s);
+    rt_free(s);
+  }
+  
+  /* delet root node */
+  cJSON_Delete(root);
+  rt_free(whitelist);
+  
+  /**/
+  MY_DEBUG("%s,%d: out string is %s\n\r",__func__,__LINE__,out);  
+  
+  
+  return ym_ok;
+EXIT:
+  if(root)  cJSON_Delete(root);
+  if(whitelist) rt_free(whitelist);
+  
+  return ym_err;
+}
+
+
+/* back to tcp client */
+static int Send(char *out, int conn)
+{
+
+  if(send(conn, out, buff_size, 0) < 0) { 
+    MY_DEBUG("%s,%d: send faild !\n\r",__func__,__LINE__); 
+    return ym_err; 
+  }
+  return ym_ok;
+}
+
+/* enable or disable whitelist */
+static int do_whitelist(int conn, JSON * js)
+{
+/*  */
+  
+  return ym_ok;
+EXIT:
+  return ym_err;
+}
+
+
+/* do sign : add user to whitelist*/
+static int do_sign(int conn, JSON * js)
+{
+  char ret;
+  white_list_t user ;
+  
+  char *out = (char*)rt_malloc(sizeof(char) * buff_size);
+  if(!out)  { MY_DEBUG("%s,%d: malloc out faild !\n\r",__func__,__LINE__); goto EXIT; }
+  rt_memset(out, 0, buff_size);
+  rt_memset(&user, 0, sizeof(white_list_t));
+  
+  strcpy(user.name, js->name);
+  strcpy(user.psd, js->passwd);
+  /* add user and passwd to whitelist */
+  ret = add_white_list(&user);
+  /* pack sign msg */
+  if(do_sign_msg(out, ret, js) < 0) { MY_DEBUG("%s,%d: do sign msg faild !\n\r",__func__,__LINE__); goto EXIT; }
+  
+  /* send to client */
+  if( Send(out, conn) < 0) { MY_DEBUG("%s,%d: send faild !\n\r",__func__,__LINE__); goto EXIT; } 
+  MY_DEBUG("%s,%d:<----------->\n\r",__func__,__LINE__);
+  return ym_ok;
+EXIT:
+  if(out) rt_free(out);
+  return ym_err;
+}
+
+/* do login */
+static int do_login(int conn, JSON * js)
+{
+//TODO..
+  int value,ret;
+ 
+  white_list_t * whitelist= RT_NULL;
+  char count = 0;  
+  char *out = (char*)rt_malloc(sizeof(char) * buff_size);
+  if(!out)  { MY_DEBUG("%s,%d: malloc out faild !\n\r",__func__,__LINE__); goto EXIT; }
+  rt_memset(out, 0, buff_size);
+  
+  /* login */
+  value = login_authentication(js);
+  
+  if(value == (IS_ADMIN|LOGIN_OK)) {
+    MY_DEBUG("%s,%d: admin login..\n\r",__func__,__LINE__);
+    /* read whitelist */
+    white_list((void*)&whitelist, &count);
+  /* packing admin json string */
+    if( do_admin_msg(out, whitelist, count, js) < 0) { 
+      MY_DEBUG("%s,%d: do admin jsson string faild !\n\r",__func__,__LINE__);
+      goto EXIT; 
+    }
+  }
+  else if(value == LOGIN_OK) {  //Normal user login
+    if( do_normal_msg(out) < 0) { MY_DEBUG("%s,%d: do mormal msg faild !\n\r",__func__,__LINE__); goto EXIT; }
+  }else if (value == LOGIN_ERR) { // login faild
+    //TODO ...
+    if( do_error_msg(out) < 0) { MY_DEBUG("%s,%d: packing err msg faild !\n\r",__func__,__LINE__); goto EXIT; }
+  }
+  
+  /*send to client */
+  MY_DEBUG("%d: now send..\n\r",__LINE__);
+  if( Send(out, conn) < 0) { MY_DEBUG("%s,%d: send faild !\n\r",__func__,__LINE__); goto EXIT; }
+
+/*free malloc*/  
+  rt_free(out);
+  rt_free(whitelist);
+  return ym_ok;
+EXIT:
+  if(out)   rt_free(out);
+  if(whitelist) rt_free(whitelist);
+  return ym_err;
+}
+
+/* recv data from connection fd */
+static int do_recv(int conn)
+{
+  int ret = 0;
+  JSON cjson;
+
+  char *buff = (char*)rt_malloc(sizeof(char)*buff_size);
+  if(!buff) { MY_DEBUG("%s,%d: malloc buff faild !\n\r",__func__,__LINE__); goto EXIT; }
+  
+  /*rt_memset*/
+  rt_memset(buff, 0, buff_size);
+  
+  if(conn < 0) { MY_DEBUG("%s,%d: con fd is %d\n\r",__func__,__LINE__,conn); goto EXIT; }
+  ret = recv(conn, buff, buff_size, 0);
+  if(ret < 0) { MY_DEBUG("%s,%d: recv error\n\r",__func__,__LINE__); goto EXIT; }
+  else if( !ret ) { MY_DEBUG("%s, %d: tcp client quit..\n\r",__func__,__LINE__); goto EXIT;}
+  
+  /* zero  cjson*/
+  rt_memset(&cjson, 0, sizeof(cjson));
+  cjson = js_to_struct(buff);
+  if(!cjson.flag) { MY_DEBUG("%s,%d: json to c struct faild !\n\r",__func__,__LINE__); goto EXIT;}
+  
+  switch(cjson.method) {
+        case login:         do_login(conn,&cjson);  break;
+        case sign_in:       do_sign(conn, &cjson);  break;
+        case off_whitelist: do_whitelist(conn, &cjson);         break; //TODO...
+        case ch_passwd:     break; //TODO...
+        case rm_user:       break; //TODO...
+  default : break;
+  };
+
+  
+  /* free buff */
+  rt_free(buff);
+   return ret;
+EXIT:
+//  lwip_close(conn);
+  if(buff)   rt_free(buff);
+  return ym_err;
+}
+
+
+/* Accept */
+static int Accept(int listenfd)
+{
+    MY_DEBUG("%s,%d\n\r",__func__,__LINE__);
+    
+    int confd = -1, i = 0, maxfd;
+    int conn_cout, ret;
+    int client[BACKLOG];
+    
+    socklen_t sin_size;
+    
+    struct timeval timeout;
+    struct sockaddr_in client_addr;
+    
+    fd_set rset;
+    fd_set allset;
+    
+    /* is listenfd < 0, return -1 */
+    if(listenfd < 0) {  MY_DEBUG("%s,%d: listenfd is error!\n\r",__func__,__LINE__); goto EXIT; }
+    
+    /* initation connection client[] */
+    for(i = 0; i < BACKLOG; i++) { client[i] = -1; }
+    
+    /* set select maxfd */
+    maxfd =  listenfd;
+    /* set connect count */
+    conn_cout = 0;
+    
+    /* set sin_size */
+    sin_size = sizeof(client_addr); 
+    
+    while(1) 
+    {
+        /* init file describle */
+        FD_ZERO(&rset);
+        FD_SET(listenfd, &rset);
+        
+        /* set timeout */
+        timeout.tv_sec = 100;
+        timeout.tv_usec = 0;
+        
+        /* add active connection to client[] */
+        for(i = 0; i < BACKLOG; i++) { if(client[i]) FD_SET(client[i], &rset); }
+        
+        /*  select */
+        ret = select(maxfd +1, &rset, NULL, NULL, NULL);
+        if(ret < 0) { MY_DEBUG("%s,%d: select error\n\r",__func__,__LINE__); goto EXIT; }
+        else if(!ret)    { MY_DEBUG("%s,%d: select...\n\r",__func__,__LINE__); continue; }
+        
+        /* check every fd in client[] by set */
+        for(i = 0; i < conn_cout; i++) {
+          /* check client[]*/
+          if(FD_ISSET(client[i], &rset)) { 
+            ret = do_recv(client[i]); 
+            if(ret < 0) { 
+              MY_DEBUG("%s,%d: do recv faild !\n\r",__func__,__LINE__); 
+              lwip_close(client[i]); 
+              FD_CLR(client[i], &rset);
+              client[i] = 0;              
+            }
+          } 
+        
+        } /* for()  check client[] */
+        
+        /* check listen fd by set or not */
+        if(FD_ISSET(listenfd, &rset)) {
+            confd = accept(listenfd, (struct sockaddr *)&client_addr, &sin_size);   /* accept */
+            MY_DEBUG("%s,%d: confd is %d:\n\r",__func__,__LINE__,confd);
+            if(confd < 0)  { MY_DEBUG("%s,%d: No new connect..\n\r",__func__,__LINE__); continue; }
+            /* add new connection to client[]  */
+            if(conn_cout < BACKLOG) { 
+              MY_DEBUG("%s,%d: add new connection to client[]..\n\r",__func__,__LINE__); 
+              client[conn_cout++] = confd;
+              /* replace select maxfd by confd */
+              if(confd > maxfd)   maxfd = confd;              
+            }else { 
+              MY_DEBUG("%s,%d: more user connect.. server will rester..\n\r",__func__,__LINE__); 
+              lwip_close(confd);
+              break;
+            }
+
+        }
+    }
+    /* close all connection and quit select */
+    for(i = 0; i < BACKLOG; i++) { if(!client[i]) lwip_close(client[i]); goto EXIT;}
+    
+    return ym_ok;
+    
+EXIT:
+    return ym_err;
+}
+
+
+
+/* initation tcp socket */
+static int init_socket(void)
+{
+  int err = -1, sock_reuse = 1;
+  int sockfd;
+  struct sockaddr_in server_addr;
+  struct sockaddr_in client_addr;
+  
+  sockfd = socket(AF_INET, SOCK_STREAM, 0);
+  if(sockfd < 0) {
+    MY_DEBUG("%s,%d: create sockfd faild !\n\r",__func__,__LINE__);
+    goto EXIT;
+  }
+  
+  /*setsockopt*/
+  err = setsockopt(sockfd, SOL_SOCKET, 
+                   SO_REUSEADDR, 
+                   (const char*)&sock_reuse, sizeof(sock_reuse));
+  if(err < 0) {
+    MY_DEBUG("%s,%d: setsockopt faild!\n\r",__func__,__LINE__);
+    goto EXIT;
+  }
+  
+    /*bind*/
+   server_addr.sin_family = AF_INET;
+   server_addr.sin_port = htons(TCP_PORT); 
+   server_addr.sin_addr.s_addr = INADDR_ANY;
+   rt_memset(&(server_addr.sin_zero),8, sizeof(server_addr.sin_zero));
+
+   if( lwip_bind(sockfd, (struct sockaddr *)&server_addr, 
+                 sizeof(struct sockaddr)) < 0) {
+                   MY_DEBUG("%s, %d: bind faild !\n\r",__func__,__LINE__);
+                   goto EXIT;
+                 }
+   else MY_DEBUG("%s:%d: sockfd init success !\n\r",__func__,__LINE__);
+    return sockfd;
+
+EXIT:
+  if(sockfd >= 0)  lwip_close(sockfd); 
+  return ym_err;
+}
+
+
+void tcp_server(void)
+{
+  int err = -1, sock_reuse = 1;
+  int tcp_sock = -1 , do_sock = -1;
+  int recv_bytes = -1;
+  JSON js;
+  rt_uint32_t addr_len;
+  
+  char tcp_recv_buff[LEN];
+  
+  struct sockaddr_in client_addr; 
+  
+  MY_DEBUG("Now in  %s, %d\n\r",__func__,__LINE__);
+  
+   tcp_sock = init_socket();
+   if(tcp_sock < 0) {
+     MY_DEBUG("%s,%d: init sockfd faild !\n\r",__func__,__LINE__);
+     return ;
+   }
+   if(lwip_listen(tcp_sock, 5) < 0) {
+     MY_DEBUG("%s, %d: listen faild!\n\r",__func__,__LINE__);
+     goto EXIT;
+   }
+  /*accept*/
+   if(Accept(tcp_sock) < 0) {
+        MY_DEBUG("%s,%d: tcp server quit..\n\r",__func__,__LINE__);
+        goto EXIT;
+   }
+    
+   
+EXIT:
+  lwip_close(tcp_sock);
+  tcp_sock = -1;
+  return ;
+}
+

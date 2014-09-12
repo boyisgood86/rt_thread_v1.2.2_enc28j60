@@ -1,7 +1,7 @@
 #include <rtthread.h>
 #include <lwip/netdb.h> 
 #include <lwip/sockets.h>
-#include "ymconfig.h"
+#include "ym_config.h"
 
 
 #define LEN     (256)
@@ -129,7 +129,7 @@ int set_socket(int sockfd, int flag)
   
 }
 
-int init_socket(void)
+static int init_socket(void)
 {
   int err = -1;
   struct sockaddr_in server_addr;

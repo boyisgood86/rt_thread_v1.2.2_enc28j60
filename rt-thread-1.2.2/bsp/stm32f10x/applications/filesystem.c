@@ -2,20 +2,36 @@
 #include <rtthread.h>
 #include "filesystem.h"
 #include "cJSON.h"
+#include "ym_config.h"
 
+
+#include "login.h"
+#include "gateway.h"
+#include "white_list.h"
 #ifdef  RT_USING_COMPONENTS_INIT
 #include <components.h>
 #endif  /* RT_USING_COMPONENTS_INIT */
 
 
-char *file_name = "/test.txt";
-
+//char *file_name = "/test.txt";
 
 void file_op(void)
 {
- //   char *out;
-    char text[] = "{\"timestamp\":\"2013-11-19T08:50:11\",\"value\":1}";
-    cJSON *json, *json_value, *json_timestamp ;
+    white_list_t *user;
+    rt_uint8_t cnt;
+    white_list((void*)&user,&cnt);
+    
+    free(user);
+    return;
+}
+
+/*
+void file_op(void)
+{
+    JSON user;
+    char *out;
+    char text[] = "{\"timestamp\":\"2013-11-19T08:50:11\",\"value\":1,\"username\":\"admin\",\"passwd\":\"admin\"}";
+    cJSON *json, *json_value, *json_timestamp,*json_user,*json_psd;
     
     MY_DEBUG("%s:%d: <------------>\n\r",__func__,__LINE__);
     list_mem();
@@ -23,7 +39,7 @@ void file_op(void)
     if(!json) {
       MY_DEBUG("%s:%d:  Error before: [%s]\n\r",__func__,__LINE__,cJSON_GetErrorPtr());
     }else {
-//        out=cJSON_Print(json);
+        out=cJSON_Print(json);
         
         json_timestamp = cJSON_GetObjectItem( json , "timestamp");
         if( json_timestamp->type == cJSON_String ) {
@@ -34,14 +50,24 @@ void file_op(void)
         if(json_value->type == cJSON_Number) {
           MY_DEBUG("%s, %d: value is %d\n\r",__func__,__LINE__, json_value->valueint);
         }
+        json_user = cJSON_GetObjectItem(json, "username");
+        json_psd = cJSON_GetObjectItem(json, "passwd");
+        memset(&user,0,sizeof(JSON));
+        strncpy(user.name,json_user->valuestring,8);
+        strncpy(user.passwd,json_psd->valuestring,8);
+        if(login_authentication(&user))
+        {
+            MY_DEBUG("%s, %d: %s:%s login success\n\r",__func__,__LINE__, json_user->valuestring,json_psd->valuestring);
+        }
+        
         cJSON_Delete(json);
- //       MY_DEBUG("%s\n",out);
-//        free(out);
+        MY_DEBUG("%s\n",out);
+        free(out);
     }
     MY_DEBUG("%s:%d <<----------------->>\n\r",__func__,__LINE__);
     return ;
 }
-
+*/
 
 
 //

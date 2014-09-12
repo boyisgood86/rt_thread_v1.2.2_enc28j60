@@ -479,6 +479,11 @@ void set_dns(char* dns_server)
 FINSH_FUNCTION_EXPORT(set_dns, set DNS server address);
 #endif
 
+
+
+
+
+
 void list_if(void)
 {
     rt_ubase_t index;

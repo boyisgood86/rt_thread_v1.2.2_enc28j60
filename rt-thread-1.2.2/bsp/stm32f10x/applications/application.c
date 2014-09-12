@@ -135,19 +135,19 @@ extern void tcp_server(void);
 static void tcp_server_thread(void *arg)
 {
   while(1) {
-     rt_thread_delay(500);
+     rt_thread_delay(1000);
      tcp_server();
   }
 }
 
-extern void test_db(void);
-static void db_test_thread(void *arg)
-{
-//  while(1) {
-    rt_thread_delay(3000);
-    test_db();
-//  }
-}
+//extern void test_db(void);
+//static void db_test_thread(void *arg)
+//{
+////  while(1) {
+//    rt_thread_delay(3000);
+//    test_db();
+////  }
+//}
 
 
 #ifdef RT_USING_RTGUI
@@ -189,11 +189,16 @@ void rt_init_thread_entry(void* parameter)
      
      if(w25x80_init("flash0", "spi20") != RT_EOK) {
           MY_DEBUG("%s, %d: w25x80 init faild !\n\r",__func__,__LINE__);
-      }     
+      } 
+     
+     /*mkfs*/
+     
+     
     /* mount sd card fat partition 1 as root directory */
     if (dfs_mount("flash0", "/", "elm", 0, 0) == 0)
     {
         rt_kprintf("File System initialized!\n");
+//        mkfs("elm", "flash0");
     }
     else {
         rt_kprintf("File System initialzation failed!\n");
@@ -245,11 +250,11 @@ void rt_init_thread_entry(void* parameter)
     #endif   /*TCP_CLIENT*/
           
     #ifdef UDP_SERVER
-//          sys_thread_new("udp_server", udp_server_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);    
+          sys_thread_new("udp_server", udp_server_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);    
     #endif /* UDP_SERVER */
           
 #ifdef TCP_SERVER
-//          sys_thread_new("tcp_server", tcp_server_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);
+          sys_thread_new("tcp_server", tcp_server_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);
 #endif /* TCP_SERVER */
           
     #ifdef UART_TO_TCP
@@ -257,7 +262,7 @@ void rt_init_thread_entry(void* parameter)
     #endif /*UART_TO_TCP*/
           
     #ifdef FILE_TEST
-          sys_thread_new("file_test", file_test_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);    
+//          sys_thread_new("file_test", file_test_thread, NULL, TCPIP_THREAD_STACKSIZE, TCPIP_THREAD_PRIO);    
     #endif /* FILE_TEST */
 
     #ifdef RT_USING_SQLITE
@@ -275,20 +280,20 @@ int rt_application_init(void)
     rt_err_t result;
 
     /* init led thread */
-    result = rt_thread_init(&led_thread,
-                            "led",
-                            led_thread_entry,
-                            RT_NULL,
-                            (rt_uint8_t*)&led_stack[0],
-                            sizeof(led_stack),
-                            20,
-                            5);
-    if (result == RT_EOK)
-    {
-        rt_thread_startup(&led_thread);
-    }else {
-      MY_DEBUG("%s, %d: Led thread faild !\n\r",__func__,__LINE__);
-    }
+//    result = rt_thread_init(&led_thread,
+//                            "led",
+//                            led_thread_entry,
+//                            RT_NULL,
+//                            (rt_uint8_t*)&led_stack[0],
+//                            sizeof(led_stack),
+//                            20,
+//                            5);
+//    if (result == RT_EOK)
+//    {
+//        rt_thread_startup(&led_thread);
+//    }else {
+//      MY_DEBUG("%s, %d: Led thread faild !\n\r",__func__,__LINE__);
+//    }
     
 //    rt_err_t result;
 //
@@ -310,11 +315,11 @@ int rt_application_init(void)
 #if (RT_THREAD_PRIORITY_MAX == 32)
     init_thread = rt_thread_create("init",
                                    rt_init_thread_entry, RT_NULL,
-                                   4096, 8, 20);
+                                   8192, 8, 20);
 #else
     init_thread = rt_thread_create("init",
                                    rt_init_thread_entry, RT_NULL,
-                                   2048, 80, 20);
+                                   8192, 80, 20);
 #endif
 
     if (init_thread != RT_NULL)

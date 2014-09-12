@@ -32,7 +32,7 @@
 
 
 
-rt_device_t usart_device = RT_NULL;
+static rt_device_t usart_device = RT_NULL;
 
 
 
